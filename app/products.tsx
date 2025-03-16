@@ -12,6 +12,7 @@ export default function Products() {
 	}, []);
 	return (
 		<ScrollView>
+			<Text>No list found.</Text>
 			{products &&
 				products.map((product, idx) => {
 					return (
@@ -26,7 +27,7 @@ export default function Products() {
 								<Text>{product.description}</Text>
 								<Image
 									source={{ uri: product.image }}
-									style={{ width: 50, height: 50 }}
+									style={{ width: 200, height: 50, borderRadius: 30 }}
 								/>
 							</View>
 						</View>

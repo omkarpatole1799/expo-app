@@ -35,7 +35,7 @@ export default function Index() {
 				keyboardType="default"
 			/>
 
-			<Link href={'/products'}>View Product</Link>
+			<Link href={'/products'}>View1 Product</Link>
 			<Button title="Login" color="black" />
 		</View>
 	);
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 		marginBottom: 20,
 		borderWidth: 1,
+		padding: 30,
 	},
 	Button: {
 		padding: 30,
