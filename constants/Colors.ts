@@ -24,3 +24,5 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const UTTIRNA_URL = 'https://uttirna.in'
