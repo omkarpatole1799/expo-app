@@ -1,14 +1,45 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { setCurrentLoggedInProcessData } from '@/components/store/auth-slice';
 import { UTTIRNA_URL } from '@/constants/Colors';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
+import React, {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useState,
+} from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/components/store/store';
+
+const defaultLoginFormValue = {
+	username: 'test', // Set the dummy username
+	password: 'test', // Set the dummy password
+	processUrl: '',
+	slot: '',
+};
 
 export default function Index() {
-	// const navigation = useNavigation()
 	const router = useRouter();
 	const [allotmentDetails, setAllotmentDetails] = useState([]);
+	const dispatch = useDispatch();
+	const navigation = useNavigation();
+
+	const currentSlotData = useSelector(
+		(state: RootState) => state.authSlice.currentLoggedinSlotData
+	);
+
+	useFocusEffect(() => {
+		if (currentSlotData) {
+			navigation.reset({
+				index: 0, // Reset the stack to only have the scan page
+				routes: [{ name: 'scan' }],
+			});
+		}
+	});
 
 	const [processList, setProcessList] = useState([
 		{
@@ -44,13 +75,9 @@ export default function Index() {
 		formState: { errors },
 		watch,
 		setValue,
+		reset,
 	} = useForm({
-		defaultValues: {
-			username: 'test', // Set the dummy username
-			password: 'test', // Set the dummy password
-			processUrl: '',
-			slot: '',
-		},
+		defaultValues: defaultLoginFormValue,
 	});
 
 	const onSubmit = useCallback((formData: any) => {
@@ -66,20 +93,35 @@ export default function Index() {
 		})
 			.then((data) => data.json())
 			.then((data) => {
-				console.log(data, '-data');
-				Alert.alert(
-					'Successful!!!',
-					`${data.usrMsg}`,
-					[
-						{
-							text: 'OK',
-							onPress: () => {
-								router.push('/scan');
-							},
-						},
-					],
-					{ cancelable: false }
+				const currentLoggedinSlotData = formData;
+				console.log(currentLoggedinSlotData, '==currentLoggedinSlotData==');
+
+				const processData = data?.data?._processData[0] || [];
+				dispatch(
+					setCurrentLoggedInProcessData({
+						processData,
+						currentLoggedinSlotData,
+					})
 				);
+
+				// const stringifiedProcessData = JSON.stringify(processData);
+				// AsyncStorage.setItem('processData', stringifiedProcessData);
+
+				router.push('/scan');
+
+				// Alert.alert(
+				// 	'Successful!!!',
+				// 	`${data.usrMsg}`,
+				// 	[
+				// 		{
+				// 			text: 'OK',
+				// 			onPress: () => {
+				// 				router.push('/scan');
+				// 			},
+				// 		},
+				// 	],
+				// 	{ cancelable: false }
+				// );
 			})
 			.catch((err) => {
 				Alert.alert('Error', 'Not able to login', [
@@ -136,7 +178,7 @@ export default function Index() {
 						<View style={styles.inputContainer}>
 							<Picker
 								style={styles.input}
-								selectedValue={'--Select Exam--'}
+								selectedValue={value}
 								onValueChange={onChange}
 							>
 								<Picker.Item label="--Select Exam--" />
@@ -166,7 +208,7 @@ export default function Index() {
 						<View style={styles.inputContainer}>
 							<Picker
 								style={styles.input}
-								selectedValue={'--Select Slot--'}
+								selectedValue={value}
 								onValueChange={onChange}
 							>
 								<Picker.Item label="--Select Slot--" />
@@ -225,7 +267,21 @@ export default function Index() {
 						</View>
 					)}
 				/>
-				<Button title="Login" onPress={handleSubmit(onSubmit)} />
+				<View
+					style={{
+						display: 'flex',
+						gap: 10,
+					}}
+				>
+					<Button title="Login" onPress={handleSubmit(onSubmit)} />
+					<Button
+						title="Refresh"
+						onPress={() => {
+							reset(defaultLoginFormValue);
+							getProcessList();
+						}}
+					/>
+				</View>
 			</View>
 		</>
 	);
