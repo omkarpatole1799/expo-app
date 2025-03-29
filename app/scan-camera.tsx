@@ -1,18 +1,18 @@
 'use client';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Button, Text, View } from 'react-native';
 
+import CryptoJS from 'react-native-crypto-js';
+const secretKey = 'form-filling-secret-key'; // Key for encryption/decryption
+
+import { RootState } from '@/components/store/store';
+import { styles } from '@/constants/styles';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, TouchableOpacity } from 'react-native';
-import { styles } from '@/constants/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	setCandidateAllData,
-	setQrData,
-} from '@/components/store/candidate-data-slice';
 import { router } from 'expo-router';
-import { RootState } from '@/components/store/store';
+import { setQrData } from '@/components/store/candidate-data-slice';
 
 const ScanCamera = () => {
 	const [isPauseScanning, setIsPauseScanning] = useState(false);
@@ -47,11 +47,22 @@ const ScanCamera = () => {
 		);
 	}
 
-	const handleBarcodeScan = async ({ data: qrData }) => {
-		const parsedQrData = JSON.parse(qrData);
+	const decrypt = async (encryptedData: string, secretKey: string) => {
+		console.log('decrypting', '==decrypting==');
+		const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+		const originalText = bytes.toString(CryptoJS.enc.Utf8);
+		console.log(originalText, '==originalText==');
+		return originalText;
+	};
 
-		if (currentSlotData.slot != parsedQrData.slot) {
-			setIsPauseScanning(true);
+	const handleBarcodeScan = async ({ data: qrData }) => {
+		setIsPauseScanning(true);
+
+		const decryptedData = await decrypt(qrData, secretKey);
+
+		const parsedQrData = JSON.parse(decryptedData);
+
+		if (currentSlotData?.slot != parsedQrData.slot) {
 			Alert.alert('Warning', 'Current Slot Doesnt Match', [
 				{
 					text: 'ok',
@@ -101,7 +112,7 @@ const ScanCamera = () => {
 				style={styles.camera}
 				onBarcodeScanned={isPauseScanning ? undefined : handleBarcodeScan}
 			>
-				<View style={styles.buttonContainer}>
+				{/* <View style={styles.buttonContainer}>
 					<TouchableOpacity
 						style={[styles.flipButton, styles.scannerButton]}
 						// onPress={toggleCameraFacing}
@@ -111,15 +122,15 @@ const ScanCamera = () => {
 						</Text>
 					</TouchableOpacity>
 
-					{/* <TouchableOpacity
+					<TouchableOpacity
 						style={[styles.closeButton, styles.scannerButton]}
 						// onPress={() => setIsQRScannerOpen(false)}
 					>
 						<Text style={[styles.text, styles.scannerButtonText]}>
 							Close Scanner
 						</Text>
-					</TouchableOpacity> */}
-				</View>
+					</TouchableOpacity>
+				</View> */}
 			</CameraView>
 		</View>
 	);

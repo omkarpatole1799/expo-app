@@ -1,5 +1,5 @@
 'use client';
-import CryptoJS from "react-native-crypto-js";
+
 import { useEffect, useRef } from 'react';
 import {
 	Alert,
@@ -9,7 +9,7 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
-	View
+	View,
 } from 'react-native';
 // import CryptoJS from 'crypto-js';
 import ProcessBannerImage from '@/components/ProcessBannerImage';
@@ -18,7 +18,6 @@ import { RootState } from '@/components/store/store';
 import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-const secretKey = 'form-filling-secret-key'; // Key for encryption/decryption
 
 const ScanQrPage = () => {
 	const dispatch = useDispatch();
@@ -32,11 +31,7 @@ const ScanQrPage = () => {
 
 	const rollNumberInputRef = useRef();
 
-	const decrypt = (encryptedData, secretKey) => {
-		const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-		const originalText = bytes.toString(CryptoJS.enc.Utf8);
-		return originalText;
-	};
+
 
 	const handleSearchCandidate = () => {
 		const rollNumber = rollNumberInputRef.current.value;
