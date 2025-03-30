@@ -8,6 +8,7 @@ interface ProcessBannerImagePropsInterface {
 const ProcessBannerImage: React.FC<ProcessBannerImagePropsInterface> = ({
 	processUrl,
 }) => {
+	console.log(processUrl,'processUrl')
 	return (
 		<>
 			{processUrl && (
