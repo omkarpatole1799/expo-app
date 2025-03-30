@@ -13,6 +13,7 @@ import { Platform, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
 import { setQrData } from '@/components/store/candidate-data-slice';
+import BtnSecondary from '@/components/UI/BtnSecondary';
 
 const ScanCamera = () => {
 	const [isPauseScanning, setIsPauseScanning] = useState(false);
@@ -42,7 +43,9 @@ const ScanCamera = () => {
 				<Text style={styles.message}>
 					We need your permission to access the camera
 				</Text>
-				<Button onPress={requestPermission} title="Grant Permission" />
+				<BtnSecondary onPress={requestPermission}>
+					Grant Permission
+				</BtnSecondary>
 			</View>
 		);
 	}
@@ -55,7 +58,7 @@ const ScanCamera = () => {
 		return originalText;
 	};
 
-	const handleBarcodeScan = async ({ data: qrData }) => {
+	const handleBarcodeScan = async ({ data: qrData }: { data: string }) => {
 		setIsPauseScanning(true);
 
 		const decryptedData = await decrypt(qrData, secretKey);
@@ -63,7 +66,7 @@ const ScanCamera = () => {
 		const parsedQrData = JSON.parse(decryptedData);
 
 		if (currentSlotData?.slot != parsedQrData.slot) {
-			Alert.alert('Warning', 'Current Slot Doesnt Match', [
+			Alert.alert('Info', 'No candidate found', [
 				{
 					text: 'ok',
 					onPress: () => {

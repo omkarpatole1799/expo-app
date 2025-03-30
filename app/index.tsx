@@ -1,19 +1,25 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { setCurrentLoggedInProcessData } from '@/components/store/auth-slice';
+import { RootState } from '@/components/store/store';
+import BtnPrimary from '@/components/UI/BtnPrimary';
+import BtnSecondary from '@/components/UI/BtnSecondary';
+import InputLabel from '@/components/UI/InputLabel';
 import { UTTIRNA_URL } from '@/constants/Colors';
+import { styles } from '@/constants/styles';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
-import React, {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+	ActivityIndicator,
+	Alert,
+	Button,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/components/store/store';
 
 const defaultLoginFormValue = {
 	username: 'test', // Set the dummy username
@@ -23,6 +29,7 @@ const defaultLoginFormValue = {
 };
 
 export default function Index() {
+	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 	const [allotmentDetails, setAllotmentDetails] = useState([]);
 	const dispatch = useDispatch();
@@ -50,6 +57,7 @@ export default function Index() {
 
 	async function getProcessList() {
 		try {
+			setIsLoading(true);
 			const url = `${UTTIRNA_URL}/api/get-process-list`;
 			const _resp = await fetch(url);
 			const _data = await _resp.json();
@@ -62,6 +70,8 @@ export default function Index() {
 				},
 			]);
 			console.log(error);
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -84,6 +94,7 @@ export default function Index() {
 		const url = `${formData.processUrl}/api/login`;
 		formData['role'] = 'USER';
 
+		setIsLoading(true);
 		fetch(url, {
 			method: 'POST',
 			headers: {
@@ -107,6 +118,7 @@ export default function Index() {
 				// const stringifiedProcessData = JSON.stringify(processData);
 				// AsyncStorage.setItem('processData', stringifiedProcessData);
 
+				setIsLoading(false);
 				router.push('/scan');
 
 				// Alert.alert(
@@ -124,6 +136,7 @@ export default function Index() {
 				// );
 			})
 			.catch((err) => {
+				setIsLoading(false);
 				Alert.alert('Error', 'Not able to login', [
 					{
 						text: 'OK',
@@ -135,8 +148,9 @@ export default function Index() {
 			});
 	}, []);
 
-	const fetchAllotmentDetails = useCallback(async (url) => {
+	const fetchAllotmentDetails = useCallback(async (url: string) => {
 		try {
+			setIsLoading(true);
 			console.log(`${url}/api/get-allotment-info`);
 			const _resp = await fetch(`${url}/api/get-allotment-info`);
 			if (!_resp.ok) throw new Error('Unable to get allotment details');
@@ -146,7 +160,7 @@ export default function Index() {
 				setAllotmentDetails(jsonData.data);
 			}
 		} catch (err) {
-			Alert.alert('Error', err?.message || 'Try again after some time.', [
+			Alert.alert('Warning', err?.message || 'Try again after some time.', [
 				{
 					text: 'OK',
 					onPress: () => {
@@ -154,6 +168,8 @@ export default function Index() {
 					},
 				},
 			]);
+		} finally {
+			setIsLoading(false);
 		}
 	}, []);
 
@@ -164,11 +180,20 @@ export default function Index() {
 		}
 	}, [watchProcessUrl, setValue]);
 
+	if (isLoading) {
+		return (
+			<SafeAreaView style={styles.loadingContainer}>
+				<ActivityIndicator size="large" color="#000" />
+				<Text>Loading...</Text>
+			</SafeAreaView>
+		);
+	}
+
 	return (
 		<>
 			<View style={styles.container}>
 				<Text style={styles.header}>Welcome</Text>
-				<Text style={styles.subHeader}>Login</Text>
+				<Text style={styles.subHeader}>Biometric Attendance</Text>
 
 				<Controller
 					control={control}
@@ -176,12 +201,13 @@ export default function Index() {
 					rules={{ required: 'Select Exam' }}
 					render={({ field: { onChange, value } }) => (
 						<View style={styles.inputContainer}>
+							<InputLabel>Select Exam</InputLabel>
 							<Picker
 								style={styles.input}
 								selectedValue={value}
 								onValueChange={onChange}
 							>
-								<Picker.Item label="--Select Exam--" />
+								<Picker.Item label="-- Select --" />
 								{processList.map((process, idx) => {
 									return (
 										<Picker.Item
@@ -206,12 +232,13 @@ export default function Index() {
 					rules={{ required: 'Select Slot' }}
 					render={({ field: { onChange, value } }) => (
 						<View style={styles.inputContainer}>
+							<InputLabel>Select Slot</InputLabel>
 							<Picker
 								style={styles.input}
 								selectedValue={value}
 								onValueChange={onChange}
 							>
-								<Picker.Item label="--Select Slot--" />
+								<Picker.Item label="-- Select --" />
 								{allotmentDetails.map((_el, idx) => {
 									return (
 										<Picker.Item
@@ -236,6 +263,7 @@ export default function Index() {
 					rules={{ required: 'Username is required' }}
 					render={({ field: { onChange, value } }) => (
 						<View style={styles.inputContainer}>
+							<InputLabel>Username</InputLabel>
 							<TextInput
 								style={styles.input}
 								placeholder="Username"
@@ -255,6 +283,7 @@ export default function Index() {
 					rules={{ required: 'Password is required' }}
 					render={({ field: { onChange, value } }) => (
 						<View style={styles.inputContainer}>
+							<InputLabel>Password</InputLabel>
 							<TextInput
 								style={styles.input}
 								placeholder="Password"
@@ -270,88 +299,21 @@ export default function Index() {
 				<View
 					style={{
 						display: 'flex',
+						flexDirection: 'row',
 						gap: 10,
 					}}
 				>
-					<Button title="Login" onPress={handleSubmit(onSubmit)} />
-					<Button
-						title="Refresh"
+					<BtnPrimary onPress={handleSubmit(onSubmit)}> Login </BtnPrimary>
+					<BtnSecondary
 						onPress={() => {
 							reset(defaultLoginFormValue);
 							getProcessList();
 						}}
-					/>
+					>
+						Refresh
+					</BtnSecondary>
 				</View>
 			</View>
 		</>
 	);
 }
-
-const styles = StyleSheet.create({
-	textStyles: {
-		fontSize: 20,
-	},
-	titleLogin: {
-		color: 'blue',
-		fontSize: 30,
-		fontWeight: 'bold',
-	},
-
-	Button: {
-		padding: 30,
-	},
-	container: {
-		display: 'flex',
-		marginBottom: 30,
-		width: '100%',
-		padding: 16,
-		backgroundColor: '#f5f5f5',
-	},
-	header: {
-		fontSize: 28,
-		fontWeight: 'bold',
-		color: '#333',
-		marginBottom: 8,
-		textAlign: 'center',
-	},
-	subHeader: {
-		fontSize: 18,
-		fontWeight: '400',
-		color: '#555',
-		marginBottom: 24,
-		textAlign: 'center',
-	},
-	inputContainer: {
-		position: 'relative',
-		width: '100%',
-		marginBottom: 26,
-	},
-	input: {
-		height: 50,
-		borderColor: '#ccc',
-		// borderWidth: 1,
-		paddingLeft: 12,
-		borderRadius: 6,
-		fontSize: 16,
-		backgroundColor: '#fff',
-	},
-
-	error: {
-		position: 'absolute',
-		color: '#ff4d4d',
-		fontSize: 12,
-		bottom: -19,
-	},
-	button: {
-		width: '100%',
-		backgroundColor: '#3b82f6',
-		paddingVertical: 14,
-		borderRadius: 6,
-		alignItems: 'center',
-	},
-	buttonText: {
-		color: '#fff',
-		fontSize: 18,
-		fontWeight: '600',
-	},
-});

@@ -8,6 +8,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import React, { useEffect, useRef, useState } from 'react';
 
 import {
+	ActivityIndicator,
 	Alert,
 	Button,
 	Image,
@@ -21,6 +22,9 @@ import { useSelector } from 'react-redux';
 import { styles } from '@/constants/styles';
 import CandidateProfilePhoto from '@/components/CandidateProfilePhoto';
 import CandidateSignature from '@/components/CandidateSignature';
+import BtnSecondary from '@/components/UI/BtnSecondary';
+import BtnPrimary from '@/components/UI/BtnPrimary';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // import getUrl from '../../components/helper/getUrl';
 
 const CandidateInfo = () => {
@@ -228,7 +232,10 @@ const CandidateInfo = () => {
 
 			{!isCameraOpen && (
 				<>
-					<ScrollView contentContainerStyle={styles.scrollContainer}>
+					<ScrollView
+						showsVerticalScrollIndicator={false}
+						contentContainerStyle={styles.scrollContainer}
+					>
 						<View style={styles.ticket}>
 							<View style={styles.photoAndSignContainer}>
 								{/* User Photo */}
@@ -282,19 +289,32 @@ const CandidateInfo = () => {
 
 							<View
 								style={{
-									backgroundColor: '#00d492',
+									backgroundColor: '#cefafe',
 									padding: 8,
 									borderRadius: 8,
 									gap: 8,
+									marginBottom: 5,
 								}}
 							>
-								<Text style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>
+								<Text
+									style={{
+										backgroundColor: '#009689',
+										padding: 8,
+										borderRadius: 5,
+										color: '#fff',
+										fontWeight: 700,
+										letterSpacing: 0.5,
+									}}
+								>
+									{`${candidate.ub_first_name} ${candidate.ub_middle_name} ${candidate.ub_last_name}`}
+								</Text>
+								<Text style={{ fontSize: 15, fontWeight: 600 }}>
 									Allotment details
 								</Text>
 
 								<Text
 									style={{
-										backgroundColor: '#009966',
+										backgroundColor: '#009689',
 										padding: 8,
 										borderRadius: 5,
 										color: '#fff',
@@ -302,20 +322,7 @@ const CandidateInfo = () => {
 										letterSpacing: 0.5,
 									}}
 								>
-									Name :{' '}
-									{`${candidate.ub_first_name} ${candidate.ub_middle_name} ${candidate.ub_last_name}`}
-								</Text>
-								<Text
-									style={{
-										backgroundColor: '#009966',
-										padding: 8,
-										borderRadius: 5,
-										color: '#fff',
-										fontWeight: 500,
-										letterSpacing: 0.5,
-									}}
-								>
-									Center : {hallticket.ca_center_name}
+									Center : {hallticket?.ca_center_name || 'N/A'}
 								</Text>
 								<View
 									style={{
@@ -325,7 +332,7 @@ const CandidateInfo = () => {
 								>
 									<Text
 										style={{
-											backgroundColor: '#009966',
+											backgroundColor: '#009689',
 											padding: 8,
 											borderRadius: 5,
 											color: '#fff',
@@ -333,12 +340,12 @@ const CandidateInfo = () => {
 											letterSpacing: 0.5,
 										}}
 									>
-										Department : {hallticket.department}
+										Department : {hallticket?.department || 'N/A'}
 									</Text>
 
 									<Text
 										style={{
-											backgroundColor: '#009966',
+											backgroundColor: '#009689',
 											padding: 8,
 											borderRadius: 5,
 											color: '#fff',
@@ -346,11 +353,11 @@ const CandidateInfo = () => {
 											letterSpacing: 0.5,
 										}}
 									>
-										Lab : {hallticket.lab_name}
+										Lab : {hallticket.lab_name || 'N/A'}
 									</Text>
 									<Text
 										style={{
-											backgroundColor: '#009966',
+											backgroundColor: '#009689',
 											padding: 8,
 											borderRadius: 5,
 											color: '#fff',
@@ -358,7 +365,7 @@ const CandidateInfo = () => {
 											letterSpacing: 0.5,
 										}}
 									>
-										Floor : {hallticket.floor}
+										Floor : {hallticket.floor || 'N/A'}
 									</Text>
 								</View>
 							</View>
@@ -386,15 +393,15 @@ const CandidateInfo = () => {
 					</ScrollView>
 
 					<View style={styles.buttonWrapper}>
-						{!isCandidateApproved && !justApproved && (
-							<View
-								style={{
-									flexDirection: 'row',
-									justifyContent: 'space-around',
-									width: '100%',
-								}}
-							>
-								<TouchableOpacity
+						{/* {!isCandidateApproved && !justApproved && ( */}
+						<View
+							style={{
+								flexDirection: 'row',
+								justifyContent: 'space-around',
+								width: '100%',
+							}}
+						>
+							{/* <TouchableOpacity
 									style={[
 										styles.buttonBase,
 										styles.buttonSecondary,
@@ -411,20 +418,32 @@ const CandidateInfo = () => {
 									>
 										{isApproving ? 'Approving' : 'Approve'}
 									</Text>
-								</TouchableOpacity>
+								</TouchableOpacity> */}
 
-								<TouchableOpacity
+							<BtnPrimary disabled={isApproving} onPress={handleApprove}>
+								{isApproving
+									? 'Approving'
+									: isCandidateApproved || justApproved
+									? 'Approve Again'
+									: 'Approve'}
+							</BtnPrimary>
+
+							{/* <TouchableOpacity
 									style={[styles.snapButton, styles.buttonPrimary]}
 									onPress={() => setIsCameraOpen(true)}
 								>
 									<Text style={styles.snapButtonText}>
 										{!photoUri ? 'Take Snap' : 'Retake Snap'}
 									</Text>
-								</TouchableOpacity>
-							</View>
-						)}
+								</TouchableOpacity> */}
 
-						{(isCandidateApproved || justApproved) && (
+							<BtnSecondary onPress={() => setIsCameraOpen(true)}>
+								{!photoUri ? 'Take Snap' : 'Retake Snap'}
+							</BtnSecondary>
+						</View>
+						{/* )} */}
+
+						{/* {(isCandidateApproved || justApproved) && (
 							<View
 								style={{
 									flexDirection: 'row',
@@ -434,14 +453,15 @@ const CandidateInfo = () => {
 							>
 								<TouchableOpacity
 									disabled={true}
-									style={[styles.buttonBase, styles.buttonPrimary]}
+									style={[styles.buttonBase, styles.buttonSecondary]}
 								>
 									<Text style={[styles.approveButtonText]}>
 										This candidate is marked present
 									</Text>
 								</TouchableOpacity>
+								<BtnSecondary>This candidate is marked present</BtnSecondary>
 							</View>
-						)}
+						)} */}
 					</View>
 				</>
 			)}

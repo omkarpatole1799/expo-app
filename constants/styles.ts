@@ -1,11 +1,17 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+	inputLabel: {
+		fontWeight: 500,
+		marginBottom: 4,
+	},
 	container: {
 		flex: 1,
 		justifyContent: 'flex-start',
 		alignItems: 'center',
 		backgroundColor: '#f4f4f4',
+		marginRight: 10,
+		marginLeft: 10,
 		// backgroundColor : 'red'
 	},
 
@@ -71,23 +77,18 @@ export const styles = StyleSheet.create({
 	},
 	ticket: {
 		width: '100%',
-		backgroundColor: '#fff',
-		padding: 20,
+		// backgroundColor: '#fff',
+		// padding: 20,
 		// borderRadius: 10,
-		borderWidth: 1,
-		borderColor: '#ccc',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		marginBottom: 2,
-		marginTop: 1,
-		alignSelf: 'center', // This will center the ticket view horizontally
-	},
-
-	header: {
-		alignItems: 'center',
-		marginBottom: 20,
+		// borderWidth: 1,
+		// borderColor: '#ccc',
+		// shadowColor: '#000',
+		// shadowOffset: { width: 0, height: 2 },
+		// shadowOpacity: 0.2,
+		// shadowRadius: 4,
+		// marginBottom: 2,
+		// marginTop: 1,
+		// alignSelf: 'center', // This will center the ticket view horizontally
 	},
 	title: {
 		fontSize: 24,
@@ -111,6 +112,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		paddingVertical: 5,
+		borderRadius: 10,
 		marginBottom: 5, // Add space between rows
 	},
 	detailLabel: {
@@ -131,7 +133,7 @@ export const styles = StyleSheet.create({
 		marginVertical: 10,
 		width: '100%',
 		paddingHorizontal: 10, // Add some padding to the sides
-		position: 'relative'
+		position: 'relative',
 	},
 
 	photo: {
@@ -145,7 +147,7 @@ export const styles = StyleSheet.create({
 	signWrapper: {
 		width: 300,
 		height: 80,
-		borderRadius: 5,
+		borderRadius: 10,
 		borderColor: 'black',
 		// backgroundColor: '#ccc',
 		// backgroundColor: 'red',
@@ -176,13 +178,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		// backgroundColor: 'green',
 	},
-	buttonBase: {
-		paddingVertical: 10,
-		paddingHorizontal: 30,
-		borderRadius: 5,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
+
 	approveButtonText: {
 		color: '#fff',
 		fontSize: 18,
@@ -195,6 +191,73 @@ export const styles = StyleSheet.create({
 
 	disabledText: {
 		color: '#aaa', // Lighter text color when disabled
+	},
+
+	textStyles: {
+		fontSize: 20,
+	},
+	titleLogin: {
+		color: 'blue',
+		fontSize: 30,
+		fontWeight: 'bold',
+	},
+
+	Button: {
+		padding: 30,
+	},
+	// container: {
+	// 	display: 'flex',
+	// 	marginBottom: 30,
+	// 	width: '100%',
+	// 	padding: 16,
+	// 	backgroundColor: '#f5f5f5',
+	// },
+	header: {
+		fontSize: 28,
+		fontWeight: 'bold',
+		color: '#333',
+		marginBottom: 8,
+		textAlign: 'center',
+	},
+	subHeader: {
+		fontSize: 18,
+		fontWeight: '400',
+		color: '#555',
+		marginBottom: 24,
+		textAlign: 'center',
+	},
+	inputContainer: {
+		position: 'relative',
+		width: '100%',
+		marginBottom: 26,
+	},
+	input: {
+		height: 50,
+		borderColor: '#ccc',
+		// borderWidth: 1,
+		paddingLeft: 12,
+		borderRadius: 6,
+		fontSize: 16,
+		backgroundColor: '#fff',
+	},
+
+	error: {
+		position: 'absolute',
+		color: '#ff4d4d',
+		fontSize: 12,
+		bottom: -19,
+	},
+	button: {
+		width: '100%',
+		backgroundColor: '#3b82f6',
+		paddingVertical: 14,
+		borderRadius: 6,
+		alignItems: 'center',
+	},
+	buttonText: {
+		color: '#fff',
+		fontSize: 18,
+		fontWeight: '600',
 	},
 
 	snapButton: {
@@ -213,12 +276,25 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 
+	buttonBase: {
+		paddingVertical: 10,
+		paddingHorizontal: 30,
+		borderRadius: 5,
+		justifyContent: 'center',
+		alignItems: 'center',
+		textAlign: 'center',
+		fontWeight: 500,
+		fontSize: 15,
+	},
+
 	buttonPrimary: {
-		backgroundColor: '#009966',
+		color: '#fff',
+		backgroundColor: '#007595',
 	},
 
 	buttonSecondary: {
-		backgroundColor: '#006045',
+		color: '#fff',
+		backgroundColor: '#00786f',
 	},
 
 	buttonDanger: {
@@ -230,6 +306,16 @@ export const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: 'bold',
 	},
+
+	allotmentInfoStrip: {
+		backgroundColor: '#6e11b0',
+		padding: 8,
+		borderRadius: 5,
+		color: '#fff',
+		fontWeight: 500,
+		letterSpacing: 0.5,
+	},
+
 	// message: {
 	// 	textAlign: 'center',
 	// 	paddingBottom: 10,
@@ -260,7 +346,7 @@ export const styles = StyleSheet.create({
 		width: 150,
 		height: 150,
 		borderRadius: 75,
-		backgroundColor: '#0ea5e9',
+		backgroundColor: '#00786f',
 		justifyContent: 'center',
 		alignItems: 'center',
 		shadowColor: '#000',
@@ -309,14 +395,14 @@ export const styles = StyleSheet.create({
 	// scannerButtonText: {
 	// 	color: '#FFF',
 	// },
-	textStyles: {
-		fontSize: 20,
-	},
-	titleLogin: {
-		color: 'blue',
-		fontSize: 30,
-		fontWeight: 'bold',
-	},
+	// textStyles: {
+	// 	fontSize: 20,
+	// },
+	// titleLogin: {
+	// 	color: 'blue',
+	// 	fontSize: 30,
+	// 	fontWeight: 'bold',
+	// },
 
 	// header: { fontSize: 28,
 	// 	fontWeight: 'bold',
@@ -324,26 +410,33 @@ export const styles = StyleSheet.create({
 	// 	marginBottom: 8,
 	// 	textAlign: 'center',
 	// },
-	inputContainer: {
-		position: 'relative',
-		width: '100%',
-		marginBottom: 26,
-	},
-	input: {
-		height: 50,
-		borderColor: '#ccc',
-		// borderWidth: 1,
-		paddingLeft: 12,
-		borderRadius: 6,
-		fontSize: 16,
-		backgroundColor: '#fff',
-		marginBottom: 20,
-	},
+	// inputContainer: {
+	// 	position: 'relative',
+	// 	width: '100%',
+	// 	marginBottom: 26,
+	// },
+	// input: {
+	// 	height: 50,
+	// 	borderColor: '#ccc',
+	// 	// borderWidth: 1,
+	// 	paddingLeft: 12,
+	// 	borderRadius: 6,
+	// 	fontSize: 16,
+	// 	backgroundColor: '#fff',
+	// 	marginBottom: 20,
+	// },
 
-	error: {
-		position: 'absolute',
-		color: '#ff4d4d',
-		fontSize: 12,
-		bottom: -19,
+	// error: {
+	// 	position: 'absolute',
+	// 	color: '#ff4d4d',
+	// 	fontSize: 12,
+	// 	bottom: -19,
+	// },
+	loadingContainer: {
+		flex: 1,
+		backgroundColor: '#f5f5f5',
+		justifyContent: 'center',
+		alignItems: 'center',
+		opacity: 0.6,
 	},
 });

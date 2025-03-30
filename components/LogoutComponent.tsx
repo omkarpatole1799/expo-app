@@ -6,18 +6,20 @@ import { useDispatch } from 'react-redux';
 import { resetAuthState } from './store/auth-slice';
 import { resetCandidateDataState } from './store/candidate-data-slice';
 import { router } from 'expo-router';
+import BtnPrimary from './UI/BtnPrimary';
+import BtnSecondary from './UI/BtnSecondary';
 
 const LogoutComponent = () => {
 	const dispatch = useDispatch();
 	const handleLogout = () => {
 		dispatch(resetAuthState());
 		dispatch(resetCandidateDataState());
-		router.push('/')
+		router.push('/');
 	};
 
 	return (
 		<>
-			<Button title="Logout" onPress={handleLogout} />
+			<BtnSecondary onPress={handleLogout}>Logout</BtnSecondary>
 		</>
 	);
 };

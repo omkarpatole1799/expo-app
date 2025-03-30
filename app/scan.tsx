@@ -1,7 +1,10 @@
 'use client';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { useEffect, useRef } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useEffect, useRef, useState } from 'react';
 import {
+	ActivityIndicator,
 	Alert,
 	KeyboardAvoidingView,
 	Platform,
@@ -18,8 +21,11 @@ import { RootState } from '@/components/store/store';
 import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
+import BtnPrimary from '@/components/UI/BtnPrimary';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ScanQrPage = () => {
+	const [isLoading, setIsLoading] = useState(false);
 	const dispatch = useDispatch();
 	const qrData = useSelector((state: RootState) => state.candidateData.qrData);
 	const processData = useSelector(
@@ -31,13 +37,11 @@ const ScanQrPage = () => {
 
 	const rollNumberInputRef = useRef();
 
-
-
 	const handleSearchCandidate = () => {
 		const rollNumber = rollNumberInputRef.current.value;
 
 		if (rollNumber == '' || !rollNumber) {
-			Alert.alert('Warning', 'Please enter valid roll number', [
+			Alert.alert('Info', 'Please enter valid roll number', [
 				{
 					text: 'OK',
 					onPress: () => {
@@ -58,13 +62,15 @@ const ScanQrPage = () => {
 			const url = `${processData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
 			console.log(url, '==url==');
 
+			setIsLoading(true)
 			fetch(url)
 				.then((data) => data.json())
 				.then((data) => {
+					setIsLoading(false)
 					console.log(data.data, '==data==');
 
 					if (currentSlotData.slot != data?.data?.slot?.slot || 0) {
-						Alert.alert('Warning', 'Current Slot Doesnt Match', [
+						Alert.alert('Info', 'No candidate found', [
 							{
 								text: 'ok',
 								onPress: () => {
@@ -78,6 +84,7 @@ const ScanQrPage = () => {
 					}
 				})
 				.catch((err) => {
+					setIsLoading(false)
 					console.log(err, '==err==');
 					Alert.alert('Info', 'No candidate found!!!', [
 						{
@@ -98,6 +105,8 @@ const ScanQrPage = () => {
 					},
 				},
 			]);
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -108,6 +117,15 @@ const ScanQrPage = () => {
 			getStudentByRollNumber(qrData.roll_no);
 		}
 	}, [qrData]);
+
+	if (isLoading) {
+		return (
+			<SafeAreaView style={styles.loadingContainer}>
+				<ActivityIndicator size="large" color="#000" />
+				<Text>Loading...</Text>
+			</SafeAreaView>
+		);
+	}
 
 	return (
 		<KeyboardAvoidingView
@@ -135,13 +153,13 @@ const ScanQrPage = () => {
 				/>
 			</View> */}
 			<ProcessBannerImage processUrl={processData.p_form_filling_site} />
-			<ScrollView scrollEnabled={true} showsVerticalScrollIndicator={false}>
+			<ScrollView scrollEnabled={false} showsVerticalScrollIndicator={false}>
 				<View
 					style={{
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						gap: '150',
+						gap: '120',
 						borderColor: 'blue',
 					}}
 				>
@@ -149,6 +167,7 @@ const ScanQrPage = () => {
 						style={{
 							width: '100%',
 							marginTop: 40,
+							gap: 10,
 						}}
 					>
 						<TextInput
@@ -158,24 +177,38 @@ const ScanQrPage = () => {
 							keyboardType="number-pad"
 							placeholder="Roll Number"
 						/>
-						<TouchableOpacity
+						{/* <TouchableOpacity
 							style={styles.buttonStyles}
 							onPress={handleSearchCandidate}
 						>
 							<Text style={styles.scanQRButtonText}>Submit</Text>
-						</TouchableOpacity>
+						</TouchableOpacity> */}
+						<BtnPrimary onPress={handleSearchCandidate}>Submit</BtnPrimary>
 					</View>
 
 					<Text>OR</Text>
 
-					<TouchableOpacity
+					{/* <TouchableOpacity
 						style={styles.scanQRButtonCenter}
 						onPress={() => {
 							router.push('/scan-camera');
 						}}
 					>
-						<Text style={styles.scanQRButtonText}>Scan QR</Text>
-					</TouchableOpacity>
+						<Text style={styles.scanQRButtonText}>SC</Text>
+					</TouchableOpacity> */}
+
+					<BtnPrimary
+						styleForWrapper={styles.scanQRButtonCenter}
+						styleForChildren={{
+							backgroundColor: 'transparent',
+						}}
+						onPress={() => {
+							router.push('/scan-camera');
+						}}
+					>
+						{/* Scan QR */}
+						<MaterialIcons name="qr-code-scanner" size={75} color="white" />
+					</BtnPrimary>
 				</View>
 			</ScrollView>
 		</KeyboardAvoidingView>
