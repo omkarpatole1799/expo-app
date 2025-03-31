@@ -21,6 +21,7 @@ import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import Loading from '@/components/UI/Loading';
 
 const ScanQrPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -33,30 +34,30 @@ const ScanQrPage = () => {
         (state: RootState) => state.authSlice.currentLoggedinSlotData
     );
 
-    const rollNumberInputRef = useRef();
+    const rollNumberInputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchCandidate = () => {
-        const rollNumber = rollNumberInputRef.current.value;
+        const rollNumber = rollNumberInputRef?.current?.value;
 
         if (rollNumber == '' || !rollNumber) {
             Alert.alert('Info', 'Please enter valid roll number', [
                 {
                     text: 'OK',
                     onPress: () => {
-                        rollNumberInputRef.current.focus();
+                        rollNumberInputRef?.current?.focus();
                     },
                 },
             ]);
         }
-
         getStudentByRollNumber(rollNumber);
     };
 
-    function getStudentByRollNumber(rollNumber: string) {
+    function getStudentByRollNumber(rollNumber: string | undefined) {
         try {
             if (!rollNumber) {
                 throw new Error('Invalid roll no');
             }
+
             const url = `${processData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
             console.log(url, '==url==');
 
@@ -65,7 +66,7 @@ const ScanQrPage = () => {
                 .then((data) => data.json())
                 .then((data) => {
                     setIsLoading(false);
-                    console.log(data.data, '==data==');
+                    console.log(data.data, '==dataa1001==');
 
                     if (currentSlotData.slot != data?.data?.slot?.slot || 0) {
                         Alert.alert('Info', 'No candidate found', [
@@ -99,7 +100,7 @@ const ScanQrPage = () => {
                 {
                     text: 'OK',
                     onPress: () => {
-                        rollNumberInputRef.current.focus();
+                        rollNumberInputRef?.current?.focus();
                     },
                 },
             ]);
@@ -109,50 +110,22 @@ const ScanQrPage = () => {
     }
 
     useEffect(() => {
-        console.log(processData, '==processData==');
-        console.log(qrData, '==qrData==');
         if (qrData) {
-            getStudentByRollNumber(qrData.roll_no);
+            getStudentByRollNumber(qrData?.roll_no);
         }
     }, [qrData]);
 
     if (isLoading) {
-        return (
-            <SafeAreaView style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#000" />
-                <Text>Loading...</Text>
-            </SafeAreaView>
-        );
+        return <Loading />;
     }
 
     return (
         <SafeAreaView
             style={{
                 flex: 1,
+                padding: 10,
             }}>
-            <KeyboardAvoidingView
-                style={{
-                    flex: 1,
-                    padding: 10,
-                }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                {/* <View
-				style={{
-					borderColor: 'black',
-					height: 100,
-					width: '100%',
-				}}
-			>
-				<Image
-					style={{
-						width: '100%',
-						height: '100%',
-					}}
-					source={{
-						uri: `${processData.p_form_filling_site}/assets/images/brand-name.jpg`,
-					}}
-				/>
-			</View> */}
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ProcessBannerImage processUrl={processData.p_form_filling_site} />
                 <ScrollView scrollEnabled={false} showsVerticalScrollIndicator={false}>
                     <View
@@ -176,25 +149,10 @@ const ScanQrPage = () => {
                                 keyboardType="number-pad"
                                 placeholder="Roll Number"
                             />
-                            {/* <TouchableOpacity
-							style={styles.buttonStyles}
-							onPress={handleSearchCandidate}
-						>
-							<Text style={styles.scanQRButtonText}>Submit</Text>
-						</TouchableOpacity> */}
                             <BtnPrimary title={'Submit'} onPress={handleSearchCandidate} />
                         </View>
 
                         <Text>OR</Text>
-
-                        {/* <TouchableOpacity
-						style={styles.scanQRButtonCenter}
-						onPress={() => {
-							router.push('/scan-camera');
-						}}
-					>
-						<Text style={styles.scanQRButtonText}>SC</Text>
-					</TouchableOpacity> */}
 
                         <BtnPrimary
                             title={<MaterialIcons name="qr-code-scanner" size={75} color="white" />}

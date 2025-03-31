@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
-import React from 'react';
 import { styles } from '@/constants/styles';
+import React from 'react';
+import { Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 
 interface BtnPrimaryPropsInterface {
     title: string | React.ReactNode;

@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
-import React from 'react';
 import { styles } from '@/constants/styles';
+import React from 'react';
+import { Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 
 interface BtnSecondaryPropsInterface {
     title: string | React.ReactNode;
@@ -10,10 +10,21 @@ interface BtnSecondaryPropsInterface {
     disabled?: boolean;
 }
 
-const BtnSecondary: React.FC<BtnSecondaryPropsInterface> = ({ title, onPress }) => {
+const BtnSecondary: React.FC<BtnSecondaryPropsInterface> = ({
+    title,
+    onPress,
+    styleForWrapper,
+    styleForChildren,
+    disabled,
+}) => {
     return (
-        <TouchableOpacity onPress={onPress}>
-            <Text style={[styles.buttonBase, styles.buttonSecondary]}>{title}</Text>;
+        <TouchableOpacity
+            onPress={onPress}
+            disabled={disabled}
+            style={[styleForWrapper, disabled ? styles.disabledButton : '']}>
+            <Text style={[styles.buttonBase, styles.buttonSecondary, styleForChildren]}>
+                {title}
+            </Text>
         </TouchableOpacity>
     );
 };
