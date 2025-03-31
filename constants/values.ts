@@ -1,0 +1,1 @@
+export const ATTENDANCE_COUNT_REFRESH_TIME = 2500;

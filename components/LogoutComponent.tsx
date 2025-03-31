@@ -10,18 +10,18 @@ import BtnPrimary from './UI/BtnPrimary';
 import BtnSecondary from './UI/BtnSecondary';
 
 const LogoutComponent = () => {
-	const dispatch = useDispatch();
-	const handleLogout = () => {
-		dispatch(resetAuthState());
-		dispatch(resetCandidateDataState());
-		router.push('/');
-	};
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+        dispatch(resetAuthState());
+        dispatch(resetCandidateDataState());
+        router.push('/');
+    };
 
-	return (
-		<>
-			<BtnSecondary onPress={handleLogout}>Logout</BtnSecondary>
-		</>
-	);
+    return (
+        <>
+            <BtnSecondary title="Logout" onPress={handleLogout} />
+        </>
+    );
 };
 
 export default LogoutComponent;

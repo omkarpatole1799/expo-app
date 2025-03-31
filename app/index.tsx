@@ -184,9 +184,10 @@ export default function Index() {
 
     return (
         <>
-            <SafeAreaView style={{
-				flex: 1,
-			}}>
+            <SafeAreaView
+                style={{
+                    flex: 1,
+                }}>
                 <View style={styles.container}>
                     <Text style={styles.header}>Welcome</Text>
                     <Text style={styles.subHeader}>Biometric Attendance</Text>
@@ -296,19 +297,16 @@ export default function Index() {
                             flexDirection: 'row',
                             gap: 10,
                         }}>
-                        <BtnPrimary onPress={handleSubmit(onSubmit)}> Login </BtnPrimary>
+                        <BtnPrimary title={'Login'} onPress={handleSubmit(onSubmit)} />
                         <BtnSecondary
+                            title={'Refresh'}
                             onPress={() => {
                                 reset(defaultLoginFormValue);
                                 getProcessList();
-                            }}>
-                            Refresh
-                        </BtnSecondary>
+                            }}
+                        />
                     </View>
                 </View>
-
-
-
             </SafeAreaView>
         </>
     );
