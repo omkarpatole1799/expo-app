@@ -27,31 +27,38 @@ const AttendanceCountComponent = () => {
                 total_student_count: 0,
             }
         );
+        console.log(1);
     }
 
     useEffect(() => {
         const url = formFillingSite;
         const slot = currentSlotData?.slot;
+        let interval = undefined;
 
         if (url && slot) {
             fetchAndSetAttendanceCount(url, Number(slot));
-            setInterval(async () => {
+            interval = setInterval(async () => {
                 fetchAndSetAttendanceCount(url, Number(slot));
             }, ATTENDANCE_COUNT_REFRESH_TIME);
         }
+
+        return () => {
+            clearInterval(interval);
+        };
     }, []);
 
     return (
-        <View style={{
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems : 'center'
-        }}>
+        <View
+            style={{
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
             <Text>Attendance Count</Text>
             <Text
                 style={{
                     padding: 2,
-                    fontSize: 22
+                    fontSize: 22,
                 }}>
                 {candidateAttendanceCount?.total_present_count || 0} /{' '}
                 {candidateAttendanceCount?.total_student_count || 0}
