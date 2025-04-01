@@ -8,14 +8,22 @@ import { resetCandidateDataState } from './store/candidate-data-slice';
 import { router } from 'expo-router';
 import BtnPrimary from './UI/BtnPrimary';
 import BtnSecondary from './UI/BtnSecondary';
+import Loading from './UI/Loading';
 
 const LogoutComponent = () => {
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleLogout = () => {
+        setIsLoading(true);
         dispatch(resetAuthState());
         dispatch(resetCandidateDataState());
         router.push('/');
     };
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <>
