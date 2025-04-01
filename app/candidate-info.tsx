@@ -101,6 +101,8 @@ const CandidateInfo = () => {
     };
 
     const handleTakePicture = async () => {
+        setJustApproved(false);
+        setIsCandidateApproved(false);
         if (cameraRef.current) {
             const data = await cameraRef.current.takePictureAsync();
             setPhotoUri(data.uri);
@@ -150,6 +152,9 @@ const CandidateInfo = () => {
         if (isApproving) return;
         try {
             setIsApproving(true);
+            if (!photoUri) {
+                throw new Error('Please capture candidate photo');
+            }
 
             const sendData = new FormData();
 
@@ -177,6 +182,12 @@ const CandidateInfo = () => {
 
             setJustApproved(true);
         } catch (err) {
+            Alert.alert('Info', err?.message || 'Unable to approve candidate, try again later', [
+                {
+                    text: 'ok',
+                    onPress: () => {},
+                },
+            ]);
             console.error(err);
             setIsApproving(false);
         } finally {
@@ -351,79 +362,31 @@ const CandidateInfo = () => {
                     </ScrollView>
 
                     <View style={styles.buttonWrapper}>
-                        {/* {!isCandidateApproved && !justApproved && ( */}
                         <View
                             style={{
                                 flexDirection: 'row',
                                 justifyContent: 'space-around',
                                 width: '100%',
                             }}>
-                            {/* <TouchableOpacity
-									style={[
-										styles.buttonBase,
-										styles.buttonSecondary,
-										isPictureTaken ? {} : styles.disabledButton,
-									]}
-									onPress={handleApprove}
-									disabled={isApproving || !isPictureTaken}
-								>
-									<Text
-										style={[
-											styles.approveButtonText,
-											isPictureTaken ? {} : styles.disabledText,
-										]}
-									>
-										{isApproving ? 'Approving' : 'Approve'}
-									</Text>
-								</TouchableOpacity> */}
-
                             <BtnPrimary
                                 title={
                                     isApproving
-                                        ? 'Approving'
+                                        ? 'Approving...'
                                         : isCandidateApproved || justApproved
-                                        ? 'Approve Again'
+                                        ? 'Approved'
                                         : 'Approve'
                                 }
-                                disabled={isApproving}
+                                disabled={isApproving || isCandidateApproved || justApproved}
                                 onPress={handleApprove}
                             />
 
-                            {/* <TouchableOpacity
-									style={[styles.snapButton, styles.buttonPrimary]}
-									onPress={() => setIsCameraOpen(true)}
-								>
-									<Text style={styles.snapButtonText}>
-										{!photoUri ? 'Take Snap' : 'Retake Snap'}
-									</Text>
-								</TouchableOpacity> */}
-
                             <BtnSecondary
                                 title={!photoUri ? 'Take Snap' : 'Retake Snap'}
-                                onPress={() => setIsCameraOpen(true)}
+                                onPress={() => {
+                                    setIsCameraOpen(true);
+                                }}
                             />
                         </View>
-                        {/* )} */}
-
-                        {/* {(isCandidateApproved || justApproved) && (
-							<View
-								style={{
-									flexDirection: 'row',
-									justifyContent: 'center',
-									width: '100%',
-								}}
-							>
-								<TouchableOpacity
-									disabled={true}
-									style={[styles.buttonBase, styles.buttonSecondary]}
-								>
-									<Text style={[styles.approveButtonText]}>
-										This candidate is marked present
-									</Text>
-								</TouchableOpacity>
-								<BtnSecondary>This candidate is marked present</BtnSecondary>
-							</View>
-						)} */}
                     </View>
                 </>
             )}
