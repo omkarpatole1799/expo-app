@@ -52,7 +52,6 @@ export default function Login() {
 
     const onSubmit = useCallback((formData: any) => {
         const url = `${formData.processUrl}/api/login`;
-        formData['role'] = 'USER';
 
         setIsLoading(true);
         fetch(url, {
@@ -64,9 +63,10 @@ export default function Login() {
         })
             .then((data) => data.json())
             .then((data) => {
-                const currentLoggedinSlotData = formData;
-
+                let currentLoggedinSlotData = data?.data?._loginDetails[0] || [];
+                currentLoggedinSlotData.slot = formData.slot;
                 const processData = data?.data?._processData[0] || [];
+
                 dispatch(
                     setCurrentLoggedInProcessData({
                         processData,

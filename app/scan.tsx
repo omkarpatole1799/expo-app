@@ -33,11 +33,13 @@ const ScanQrPage = () => {
     const currentSlotData = useSelector(
         (state: RootState) => state.authSlice.currentLoggedinSlotData
     );
+    console.log(currentSlotData, '-currentSlotDatacurrentSlotData');
 
     const rollNumberInputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchCandidate = () => {
         const rollNumber = rollNumberInputRef?.current?.value;
+        console.log(rollNumber, '-rollNumberrollNumber');
 
         if (rollNumber == '' || !rollNumber) {
             Alert.alert('Info', 'Please enter valid roll number', [
@@ -53,6 +55,7 @@ const ScanQrPage = () => {
     };
 
     function getStudentByRollNumber(rollNumber: string | undefined) {
+        console.log(rollNumber, '-in here-----------');
         try {
             if (!rollNumber) {
                 throw new Error('Invalid roll no');
@@ -67,6 +70,9 @@ const ScanQrPage = () => {
                 .then((data) => {
                     setIsLoading(false);
                     console.log(data.data, '==dataa1001==');
+
+                    console.log(data?.data?.slot?.slot, '--data?.data?.slot?.slot');
+                    console.log(currentSlotData.slot, '-currentSlotData.slot');
 
                     if (currentSlotData.slot != data?.data?.slot?.slot || 0) {
                         Alert.alert('Info', 'No candidate found', [

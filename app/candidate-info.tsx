@@ -36,6 +36,10 @@ const CandidateInfo = () => {
         (state: RootState) => state.authSlice.currentLoggedInProcessData
     );
 
+    const currentLoggedInUserId = useSelector(
+        (state: RootState) => state.authSlice.currentLoggedinSlotData.id
+    );
+
     const [isCameraOpen, setIsCameraOpen] = useState(false);
 
     console.log(candidateFullData, '==candidateFullData==');
@@ -146,28 +150,20 @@ const CandidateInfo = () => {
         if (isApproving) return;
         try {
             setIsApproving(true);
-            const compressedPhotoUri = await compressImage(photoUri);
 
             const sendData = new FormData();
+
             sendData.set('rollNo', hallticket.ca_roll_number);
             sendData.set('f_id', hallticket.id);
             sendData.set('r_id', hallticket.ca_reg_id);
+            sendData.set('approved_by_user_id', `${currentLoggedInUserId}`);
 
-            const candidatePhotoFile = {
-                uri: compressedPhotoUri,
-                type: 'image/jpeg',
-                name: 'photo.jpg',
-            };
-
+            const compressedPhotoUri = await compressImage(photoUri);
             const fileBase64 = (await readFile(compressedPhotoUri)) as string;
 
             const base64Data = fileBase64.replace(/^data:image\/(jpeg|jpg|png);base64,/, '');
 
             sendData.set('candidatePhoto', base64Data);
-
-            for (let [key, value] of sendData) {
-                console.log(key, value, '==key, value==');
-            }
 
             let url = `${processData.p_form_filling_site}/api/save-approval-details`;
             const _resp = await fetch(url, {
