@@ -3,25 +3,24 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
     Text,
     TextInput,
-    View,
+    View
 } from 'react-native';
 // import CryptoJS from 'crypto-js';
 import ProcessBannerImage from '@/components/ProcessBannerImage';
 import { setCandidateAllData } from '@/components/store/candidate-data-slice';
 import { RootState } from '@/components/store/store';
 import BtnPrimary from '@/components/UI/BtnPrimary';
+import Loading from '@/components/UI/Loading';
 import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import Loading from '@/components/UI/Loading';
 
 const ScanQrPage = () => {
     const [isLoading, setIsLoading] = useState(false);

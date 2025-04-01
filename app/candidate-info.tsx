@@ -7,24 +7,21 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import React, { useEffect, useRef, useState } from 'react';
 
+import CandidateProfilePhoto from '@/components/CandidateProfilePhoto';
+import CandidateSignature from '@/components/CandidateSignature';
+import BtnPrimary from '@/components/UI/BtnPrimary';
+import BtnSecondary from '@/components/UI/BtnSecondary';
+import { styles } from '@/constants/styles';
 import {
-    ActivityIndicator,
     Alert,
     Button,
     Image,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { useSelector } from 'react-redux';
-import { styles } from '@/constants/styles';
-import CandidateProfilePhoto from '@/components/CandidateProfilePhoto';
-import CandidateSignature from '@/components/CandidateSignature';
-import BtnSecondary from '@/components/UI/BtnSecondary';
-import BtnPrimary from '@/components/UI/BtnPrimary';
-import { SafeAreaView } from 'react-native-safe-area-context';
 // import getUrl from '../../components/helper/getUrl';
 
 const CandidateInfo = () => {
