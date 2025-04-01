@@ -50,42 +50,49 @@ export default function Login() {
         defaultValues: defaultLoginFormValue,
     });
 
-    const onSubmit = useCallback((formData: any) => {
-        const url = `${formData.processUrl}/api/login`;
+    const onSubmit = useCallback(async (formData: any) => {
+        try {
+            const url = `${formData.processUrl}/api/login`;
 
-        setIsLoading(true);
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        })
-            .then((data) => data.json())
-            .then((data) => {
-                let currentLoggedinSlotData = data?.data?._loginDetails[0] || [];
-                currentLoggedinSlotData.slot = formData.slot;
-                const processData = data?.data?._processData[0] || [];
+            setIsLoading(true);
 
-                dispatch(
-                    setCurrentLoggedInProcessData({
-                        processData,
-                        currentLoggedinSlotData,
-                    })
-                );
-
-                setIsLoading(false);
-                router.replace('/scan');
-            })
-            .catch((err) => {
-                setIsLoading(false);
-                Alert.alert('Error', 'Not able to login', [
-                    {
-                        text: 'OK',
-                        onPress: () => {},
-                    },
-                ]);
+            const _resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
+
+            if (!_resp.ok) {
+                const errResp = await _resp.json();
+                throw new Error(errResp?.errMsg || 'Not able to login');
+            }
+
+            const data = await _resp.json();
+
+            let currentLoggedinSlotData = data?.data?._loginDetails[0] || [];
+            currentLoggedinSlotData.slot = formData.slot;
+            const processData = data?.data?._processData[0] || [];
+
+            dispatch(
+                setCurrentLoggedInProcessData({
+                    processData,
+                    currentLoggedinSlotData,
+                })
+            );
+
+            router.replace('/scan');
+        } catch (error) {
+            Alert.alert('Error', error?.message || 'Not able to login', [
+                {
+                    text: 'OK',
+                    onPress: () => {},
+                },
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     const fetchAllotmentDetails = useCallback(async (url: string) => {

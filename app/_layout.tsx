@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import AttendanceCountComponent from '@/components/UI/AttendanceCount/AttendanceCountComponent';
 import LogoutComponent from '@/components/LogoutComponent';
 import store from '@/components/store/store';
+import { View } from 'react-native';
 
 const _layout = () => {
     return (
@@ -19,13 +20,19 @@ const _layout = () => {
                 <Stack.Screen
                     name="scan"
                     options={{
-                        headerTitle: "",
+                        headerTitle: '',
                         headerRight: () => {
                             return (
-                                <>
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        width: '100%',
+                                        justifyContent: 'space-around',
+                                        alignItems: 'center'
+                                    }}>
                                     <AttendanceCountComponent />
                                     <LogoutComponent />
-                                </>
+                                </View>
                             );
                         },
                     }}

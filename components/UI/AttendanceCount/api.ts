@@ -1,4 +1,5 @@
 export async function fetchAttendanceCount(url: string, slot: number) {
+    console.log(url, slot, '-hhererer');
     try {
         const _url = `${url}/api/get-attendance-count/${slot}`;
         const _resp = await fetch(_url);
