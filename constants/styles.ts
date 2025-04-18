@@ -100,6 +100,7 @@ export const styles = StyleSheet.create({
     },
     details: {
         marginBottom: 20,
+        padding: 10,
     },
     detailRow: {
         flexDirection: 'row',
@@ -142,6 +143,7 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#ccc',
         position: 'relative',
+        resizeMode: 'stretch',
     },
 
     signWrapper: {
@@ -155,7 +157,7 @@ export const styles = StyleSheet.create({
     signPhoto: {
         width: '100%',
         height: '100%',
-        resizeMode: 'contain',
+        resizeMode: 'stretch',
     },
     signatureSection: {
         flexDirection: 'row',

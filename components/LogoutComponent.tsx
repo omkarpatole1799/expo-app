@@ -8,18 +8,18 @@ import Loading from './UI/Loading';
 
 const LogoutComponent = () => {
     const dispatch = useDispatch();
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
 
     const handleLogout = () => {
-        setIsLoading(true);
+        // setIsLoading(true);
         dispatch(resetAuthState());
         dispatch(resetCandidateDataState());
         router.push('/');
     };
 
-    if (isLoading) {
-        return <Loading />;
-    }
+    // if (isLoading) {
+    //     return <Loading />;
+    // }
 
     return (
         <>

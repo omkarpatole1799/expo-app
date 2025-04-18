@@ -9,20 +9,25 @@ import {
     ScrollView,
     Text,
     TextInput,
-    View
+    View,
 } from 'react-native';
 // import CryptoJS from 'crypto-js';
 import ProcessBannerImage from '@/components/ProcessBannerImage';
-import { setCandidateAllData } from '@/components/store/candidate-data-slice';
+import {
+    resetCandidateDataState,
+    setCandidateAllData,
+} from '@/components/store/candidate-data-slice';
 import { RootState } from '@/components/store/store';
 import BtnPrimary from '@/components/UI/BtnPrimary';
 import Loading from '@/components/UI/Loading';
 import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 
 const ScanQrPage = () => {
+    const inset = useSafeAreaInsets();
+
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const qrData = useSelector((state: RootState) => state.candidateData.qrData);
@@ -32,7 +37,6 @@ const ScanQrPage = () => {
     const currentSlotData = useSelector(
         (state: RootState) => state.authSlice.currentLoggedinSlotData
     );
-    console.log(currentSlotData, '-currentSlotDatacurrentSlotData');
 
     const rollNumberInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,14 +78,16 @@ const ScanQrPage = () => {
                     console.log(currentSlotData.slot, '-currentSlotData.slot');
 
                     if (currentSlotData.slot != data?.data?.slot?.slot || 0) {
-                        Alert.alert('Info', 'No candidate found', [
-                            {
-                                text: 'ok',
-                                onPress: () => {
-                                    router.push('/scan');
-                                },
-                            },
-                        ]);
+                        throw new Error('No candidate found');
+                        // dispatch(resetCandidateDataState());
+                        // Alert.alert('Info', 'No candidate found2', [
+                        //     {
+                        //         text: 'ok',
+                        //         onPress: () => {
+                        //             router.push('/scan');
+                        //         },
+                        //     },
+                        // ]);
                     } else {
                         dispatch(setCandidateAllData(data?.data || []));
                         router.push('/candidate-info');
@@ -90,6 +96,7 @@ const ScanQrPage = () => {
                 .catch((err) => {
                     setIsLoading(false);
                     console.log(err, '==err==');
+                    dispatch(resetCandidateDataState());
                     Alert.alert('Info', 'No candidate found!!!', [
                         {
                             text: 'ok',
@@ -115,7 +122,7 @@ const ScanQrPage = () => {
     }
 
     useEffect(() => {
-        if (qrData) {
+        if (qrData?.roll_no && qrData.roll_no !== 0) {
             getStudentByRollNumber(qrData?.roll_no);
         }
     }, [qrData]);
@@ -126,8 +133,8 @@ const ScanQrPage = () => {
 
     return (
         <SafeAreaView
+            edges={['bottom']}
             style={{
-                flex: 1,
                 padding: 10,
             }}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>

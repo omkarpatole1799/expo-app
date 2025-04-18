@@ -12,19 +12,13 @@ import CandidateSignature from '@/components/CandidateSignature';
 import BtnPrimary from '@/components/UI/BtnPrimary';
 import BtnSecondary from '@/components/UI/BtnSecondary';
 import { styles } from '@/constants/styles';
-import {
-    Alert,
-    Button,
-    Image,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { Alert, Button, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 // import getUrl from '../../components/helper/getUrl';
 
 const CandidateInfo = () => {
+    const inset = useSafeAreaInsets();
     const candidateFullData = useSelector(
         (state: RootState) => state.candidateData.candidateAllDetails
     );
@@ -76,21 +70,23 @@ const CandidateInfo = () => {
         }
     }, []);
 
-    if (!permission) {
-        return (
-            <View>
-                <Text>This is htis</Text>
-            </View>
-        );
-    }
+    // if (!permission) {
+    //     return (
+    //         <View>
+    //             <Text>This is htis</Text>
+    //         </View>
+    //     );
+    // }
 
-    if (!permission.granted) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.message}>We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="Grant Permission" />
-            </View>
-        );
+    if (permission) {
+        if (!permission.granted) {
+            return (
+                <View style={styles.container}>
+                    <Text style={styles.message}>We need your permission to show the camera</Text>
+                    <Button onPress={requestPermission} title="Grant Permission" />
+                </View>
+            );
+        }
     }
 
     const toggleCameraFacing = () => {
@@ -168,6 +164,7 @@ const CandidateInfo = () => {
             sendData.set('candidatePhoto', base64Data);
 
             let url = `${processData.p_form_filling_site}/api/save-approval-details`;
+            console.log(url, '-url=====');
             const _resp = await fetch(url, {
                 method: 'POST',
                 body: sendData,
@@ -193,7 +190,14 @@ const CandidateInfo = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView
+            edges={['bottom']}
+            style={{
+                flex: 1,
+                // padding: 10,
+                paddingBottom: inset.bottom,
+            }}>
+            {/* <View style={styles.container}> */}
             {isCameraOpen && (
                 <CameraView style={styles.fullScreenCamera} ref={cameraRef}>
                     <View style={styles.buttonContainer}>
@@ -226,7 +230,7 @@ const CandidateInfo = () => {
                                 />
 
                                 <TouchableOpacity
-                                    disabled={isCandidateApproved}
+                                    // disabled={isCandidateApproved}
                                     onPress={() => {
                                         setIsCameraOpen(true);
                                     }}>
@@ -366,11 +370,15 @@ const CandidateInfo = () => {
                                 width: '100%',
                             }}>
                             <BtnPrimary
+                                styleForChildren={{
+                                    backgroundColor:
+                                        isCandidateApproved || justApproved ? 'green' : '#007595',
+                                }}
                                 title={
                                     isApproving
                                         ? 'Approving...'
                                         : isCandidateApproved || justApproved
-                                        ? 'Approved'
+                                        ? 'Present'
                                         : 'Approve'
                                 }
                                 disabled={isApproving || isCandidateApproved || justApproved}
@@ -387,7 +395,8 @@ const CandidateInfo = () => {
                     </View>
                 </>
             )}
-        </View>
+            {/* </View> */}
+        </SafeAreaView>
     );
 };
 

@@ -27,13 +27,14 @@ const AttendanceCountComponent = () => {
                 total_student_count: 0,
             }
         );
-        console.log(1);
     }
 
     useEffect(() => {
         const url = formFillingSite;
         const slot = currentSlotData?.slot;
         let interval = undefined;
+
+        if (url === '' || slot === '') return;
 
         if (url && slot) {
             fetchAndSetAttendanceCount(url, Number(slot));

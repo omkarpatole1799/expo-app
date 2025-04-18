@@ -12,18 +12,19 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
-import { setQrData } from '@/components/store/candidate-data-slice';
+import { resetCandidateDataState, setQrData } from '@/components/store/candidate-data-slice';
 import BtnSecondary from '@/components/UI/BtnSecondary';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ScanCamera = () => {
     const [isPauseScanning, setIsPauseScanning] = useState(false);
-    const processData = useSelector(
-        (state: RootState) => state.authSlice.currentLoggedInProcessData
-    );
+    // const processData = useSelector(
+    //     (state: RootState) => state.authSlice.currentLoggedInProcessData
+    // );
     const currentSlotData = useSelector(
         (state: RootState) => state.authSlice.currentLoggedinSlotData
     );
-    const [scannedData, setScannedData] = useState(null);
+    // const [scannedData, setScannedData] = useState(null);
     const [permission, requestPermission] = useCameraPermissions();
     const dispatch = useDispatch();
     if (!permission) {
@@ -46,10 +47,8 @@ const ScanCamera = () => {
     }
 
     const decrypt = async (encryptedData: string, secretKey: string) => {
-        console.log('decrypting', '==decrypting==');
         const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
         const originalText = bytes.toString(CryptoJS.enc.Utf8);
-        console.log(originalText, '==originalText==');
         return originalText;
     };
 
@@ -61,6 +60,8 @@ const ScanCamera = () => {
         const parsedQrData = JSON.parse(decryptedData);
 
         if (currentSlotData?.slot != parsedQrData.slot) {
+            // setIsPauseScanning(true);
+            dispatch(resetCandidateDataState());
             Alert.alert('Info', 'No candidate found', [
                 {
                     text: 'ok',
@@ -70,6 +71,7 @@ const ScanCamera = () => {
                 },
             ]);
         } else {
+            // setIsPauseScanning(true);
             dispatch(setQrData(parsedQrData));
             router.push('/scan');
         }
@@ -99,10 +101,7 @@ const ScanCamera = () => {
     };
 
     return (
-        <View
-            style={{
-                flex: 1,
-            }}>
+        <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
             {Platform.OS === 'android' ? <StatusBar /> : null}
 
             <CameraView
@@ -128,7 +127,7 @@ const ScanCamera = () => {
 					</TouchableOpacity>
 				</View> */}
             </CameraView>
-        </View>
+        </SafeAreaView>
     );
 };
 

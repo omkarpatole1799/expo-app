@@ -1,8 +1,10 @@
 import { styles } from '@/constants/styles';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Loading = () => {
+    const inset = useSafeAreaInsets();
     return (
         <SafeAreaView style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#000" />

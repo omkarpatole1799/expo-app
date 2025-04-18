@@ -6,8 +6,10 @@ import AttendanceCountComponent from '@/components/UI/AttendanceCount/Attendance
 import LogoutComponent from '@/components/LogoutComponent';
 import store from '@/components/store/store';
 import { View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const _layout = () => {
+    const inset = useSafeAreaInsets();
     return (
         <Provider store={store}>
             <Stack>
@@ -28,7 +30,7 @@ const _layout = () => {
                                         flexDirection: 'row',
                                         width: '100%',
                                         justifyContent: 'space-around',
-                                        alignItems: 'center'
+                                        alignItems: 'center',
                                     }}>
                                     <AttendanceCountComponent />
                                     <LogoutComponent />
