@@ -15,8 +15,8 @@ import { getProcessList } from './api';
 import Loading from '../UI/Loading';
 
 const defaultLoginFormValue = {
-    username: 'test', // Set the dummy username
-    password: 'test', // Set the dummy password
+    username: '', // Set the dummy username
+    password: '', // Set the dummy password
     processUrl: '',
     slot: '',
 };
