@@ -106,15 +106,6 @@ const CandidateInfo = () => {
         }
     };
 
-    const retakePicture = () => {
-        // setPhotoUri(null);
-        setIsPictureTaken(false);
-    };
-
-    const savePicture = () => {
-        console.log('Picture saved:', photoUri);
-    };
-
     const compressImage = async (uri, maxWidth = 800, maxHeight = 800, quality = 20) => {
         try {
             const result = await ImageManipulator.manipulateAsync(
