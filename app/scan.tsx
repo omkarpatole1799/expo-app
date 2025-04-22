@@ -1,7 +1,7 @@
 'use client';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Alert,
     KeyboardAvoidingView,
@@ -19,28 +19,23 @@ import {
 } from '@/components/store/candidate-data-slice';
 import { RootState } from '@/components/store/store';
 import BtnPrimary from '@/components/UI/BtnPrimary';
-import Loading from '@/components/UI/Loading';
 import { styles } from '@/constants/styles';
 import { router } from 'expo-router';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import AttendanceUpdator from '@/components/AttendanceUpdator';
+
+let count = 0;
 
 const ScanQrPage = () => {
-    const inset = useSafeAreaInsets();
-
-    const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const qrData = useSelector((state: RootState) => state.candidateData.qrData);
-    const processData = useSelector(
-        (state: RootState) => state.authSlice.currentLoggedInProcessData
-    );
-    const currentSlotData = useSelector(
-        (state: RootState) => state.authSlice.currentLoggedinSlotData
-    );
+    const authSlice = useSelector((state: RootState) => state.authSlice);
 
     const rollNumberInputRef = useRef<HTMLInputElement>(null);
 
     const handleSearchCandidate = () => {
+        dispatch(resetCandidateDataState());
         const rollNumber = rollNumberInputRef?.current?.value;
         console.log(rollNumber, '-rollNumberrollNumber');
 
@@ -57,79 +52,66 @@ const ScanQrPage = () => {
         getStudentByRollNumber(rollNumber);
     };
 
-    function getStudentByRollNumber(rollNumber: string | undefined) {
+    const getStudentByRollNumber = useCallback(async (rollNumber: string | number | undefined) => {
         console.log(rollNumber, '-in here-----------');
         try {
             if (!rollNumber) {
                 throw new Error('Invalid roll no');
             }
 
-            const url = `${processData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
-            console.log(url, '==url==');
+            const url = `${authSlice.currentLoggedInProcessData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
 
-            setIsLoading(true);
-            fetch(url)
-                .then((data) => data.json())
-                .then((data) => {
-                    setIsLoading(false);
-                    console.log(data.data, '==dataa1001==');
+            const _resp = await fetch(url);
+            const jsonData = await _resp.json();
+            if (!_resp.ok) {
+                throw new Error(jsonData?.errMsg || 'No candidate found');
+            }
 
-                    console.log(data?.data?.slot?.slot, '--data?.data?.slot?.slot');
-                    console.log(currentSlotData.slot, '-currentSlotData.slot');
+            // console.log(jsonData, 'jsonData');
 
-                    if (currentSlotData.slot != data?.data?.slot?.slot || 0) {
-                        throw new Error('No candidate found');
-                        // dispatch(resetCandidateDataState());
-                        // Alert.alert('Info', 'No candidate found2', [
-                        //     {
-                        //         text: 'ok',
-                        //         onPress: () => {
-                        //             router.push('/scan');
-                        //         },
-                        //     },
-                        // ]);
-                    } else {
-                        dispatch(setCandidateAllData(data?.data || []));
-                        router.push('/candidate-info');
-                    }
-                })
-                .catch((err) => {
-                    setIsLoading(false);
-                    console.log(err, '==err==');
-                    dispatch(resetCandidateDataState());
-                    Alert.alert('Info', 'No candidate found!!!', [
-                        {
-                            text: 'ok',
-                            onPress: () => {
-                                router.push('/scan');
-                            },
-                        },
-                    ]);
-                });
+            console.log(jsonData?.data?.slot?.slot, '--data?.data?.slot?.slot');
+            console.log(authSlice.currentLoggedinSlotData.slot, '-currentSlotData.slot');
+
+            console.log(count++, '----------------count=============');
+
+            if (authSlice?.currentLoggedinSlotData.slot != jsonData?.data?.slot?.slot || 0) {
+                throw new Error('No candidate found');
+            } else {
+                dispatch(setCandidateAllData(jsonData?.data || []));
+                router.push('/candidate-info');
+            }
         } catch (error) {
-            console.log(error);
-            Alert.alert('Error', 'Unable to get student details', [
+            dispatch(resetCandidateDataState());
+            Alert.alert('Info', error?.message || 'No candidate found', [
                 {
                     text: 'OK',
-                    onPress: () => {
-                        rollNumberInputRef?.current?.focus();
-                    },
+                    onPress: () => {},
                 },
             ]);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
-    }
+    }, []);
+
+    const lastQueriedRollNumberRef = useRef<string | number | null>(null);
 
     useEffect(() => {
-        if (qrData?.roll_no && qrData.roll_no !== 0) {
-            getStudentByRollNumber(qrData?.roll_no);
+        const currentRollNo = qrData?.roll_no;
+
+        // Check if valid and new roll number
+        if (
+            currentRollNo &&
+            currentRollNo !== 0 &&
+            currentRollNo !== lastQueriedRollNumberRef.current
+        ) {
+            lastQueriedRollNumberRef.current = currentRollNo;
+            getStudentByRollNumber(currentRollNo);
         }
     }, [qrData]);
 
-    if (isLoading) {
-        return <Loading />;
-    }
+    // if (isLoading) {
+    //     return <Loading />;
+    // }
 
     return (
         <SafeAreaView
@@ -137,8 +119,11 @@ const ScanQrPage = () => {
             style={{
                 padding: 10,
             }}>
+            <AttendanceUpdator />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <ProcessBannerImage processUrl={processData.p_form_filling_site} />
+                <ProcessBannerImage
+                    processUrl={authSlice.currentLoggedInProcessData.p_form_filling_site}
+                />
                 <ScrollView scrollEnabled={false} showsVerticalScrollIndicator={false}>
                     <View
                         style={{
@@ -173,6 +158,7 @@ const ScanQrPage = () => {
                                 backgroundColor: 'transparent',
                             }}
                             onPress={() => {
+                                dispatch(resetCandidateDataState());
                                 router.push('/scan-camera');
                             }}
                         />

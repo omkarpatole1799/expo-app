@@ -13,6 +13,10 @@ interface AuthSliceInterface {
         slot: string;
         username: string;
     };
+    attendanceCount: {
+        total_present_count: number;
+        total_student_count: number;
+    };
 }
 
 const initialState: AuthSliceInterface = {
@@ -29,6 +33,10 @@ const initialState: AuthSliceInterface = {
         slot: '',
         username: '',
     },
+    attendanceCount: {
+        total_present_count: 0,
+        total_student_count: 0,
+    },
 };
 
 const authSlice = createSlice({
@@ -41,13 +49,19 @@ const authSlice = createSlice({
             state.currentLoggedinSlotData = action.payload.currentLoggedinSlotData;
         },
 
+        setAttendanceCount: (state, action) => {
+            state.attendanceCount = action.payload;
+        },
+
         resetAuthState: (state) => {
             state.isAuth = false;
             state.currentLoggedInProcessData = initialState.currentLoggedInProcessData;
             state.currentLoggedinSlotData = initialState.currentLoggedinSlotData;
+            state.attendanceCount = initialState.attendanceCount;
         },
     },
 });
 
-export const { setCurrentLoggedInProcessData, resetAuthState } = authSlice.actions;
+export const { setCurrentLoggedInProcessData, resetAuthState, setAttendanceCount } =
+    authSlice.actions;
 export default authSlice;

@@ -33,7 +33,7 @@ const CandidateInfo = () => {
 
     const [isCameraOpen, setIsCameraOpen] = useState(false);
 
-    console.log(candidateFullData, '==candidateFullData==');
+    // console.log(candidateFullData, '==candidateFullData==');
 
     const { p: process, ca: candidate, ht: hallticket, slot, s3BucketUrl } = candidateFullData;
 

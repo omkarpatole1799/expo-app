@@ -1,52 +1,14 @@
-import { ATTENDANCE_COUNT_REFRESH_TIME } from '@/constants/values';
-import React, { useEffect, useState } from 'react';
+import { RootState } from '@/components/store/store';
+import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-import { fetchAttendanceCount } from './api';
 
 const AttendanceCountComponent = () => {
-    const currentSlotData = useSelector(
-        (state: RootState) => state.authSlice.currentLoggedinSlotData
-    );
+    const attendanceCount = useSelector((state: RootState) => state.authSlice.attendanceCount);
 
-    const formFillingSite = useSelector(
-        (state: RootState) => state.authSlice.currentLoggedInProcessData.p_form_filling_site
-    );
-
-    const [candidateAttendanceCount, setCandidateAttendanceCount] = useState({
-        total_present_count: 0,
-        total_student_count: 0,
-    });
-
-    async function fetchAndSetAttendanceCount(url: string, slot: number) {
-        const data = await fetchAttendanceCount(url, slot);
-        setCandidateAttendanceCount(
-            data?.data[0] || {
-                total_present_count: 0,
-                total_student_count: 0,
-            }
-        );
-    }
-
-    useEffect(() => {
-        const url = formFillingSite;
-        const slot = currentSlotData?.slot;
-        let interval = undefined;
-
-        if (url === '' || slot === '') return;
-
-        if (url && slot) {
-            fetchAndSetAttendanceCount(url, Number(slot));
-            interval = setInterval(async () => {
-                fetchAndSetAttendanceCount(url, Number(slot));
-            }, ATTENDANCE_COUNT_REFRESH_TIME);
-        }
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+    const formatedAttendanceCount = useMemo(() => {
+        return `${attendanceCount.total_present_count} / ${attendanceCount.total_student_count}`;
+    }, [attendanceCount]);
 
     return (
         <View
@@ -61,8 +23,7 @@ const AttendanceCountComponent = () => {
                     padding: 2,
                     fontSize: 22,
                 }}>
-                {candidateAttendanceCount?.total_present_count || 0} /{' '}
-                {candidateAttendanceCount?.total_student_count || 0}
+                {formatedAttendanceCount}
             </Text>
         </View>
     );

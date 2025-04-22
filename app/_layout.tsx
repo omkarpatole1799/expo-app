@@ -2,14 +2,12 @@ import { Stack } from 'expo-router';
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import AttendanceCountComponent from '@/components/UI/AttendanceCount/AttendanceCountComponent';
 import LogoutComponent from '@/components/LogoutComponent';
 import store from '@/components/store/store';
+import AttendanceCountComponent from '@/components/UI/AttendanceCount/AttendanceCountComponent';
 import { View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const _layout = () => {
-    const inset = useSafeAreaInsets();
     return (
         <Provider store={store}>
             <Stack>
