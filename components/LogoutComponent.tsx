@@ -1,10 +1,9 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { resetAuthState } from './store/auth-slice';
 import { resetCandidateDataState } from './store/candidate-data-slice';
 import BtnSecondary from './UI/BtnSecondary';
-import Loading from './UI/Loading';
 
 const LogoutComponent = () => {
     const dispatch = useDispatch();
@@ -14,7 +13,7 @@ const LogoutComponent = () => {
         // setIsLoading(true);
         dispatch(resetAuthState());
         dispatch(resetCandidateDataState());
-        router.push('/');
+        router.replace('/');
     };
 
     // if (isLoading) {

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Image, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { RootState } from './store/store';
 
-interface ProcessBannerImagePropsInterface {
-    processUrl: string | null;
-}
-
-const ProcessBannerImage: React.FC<ProcessBannerImagePropsInterface> = ({ processUrl }) => {
-    console.log(processUrl, 'processUrl');
+const ProcessBannerImage = () => {
+    const processUrl = useSelector(
+        (state: RootState) => state.authSlice.currentLoggedInProcessData.p_form_filling_site
+    );
     return (
         <>
             {processUrl && (

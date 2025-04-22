@@ -60,11 +60,13 @@ const ScanQrPage = () => {
             }
 
             const url = `${authSlice.currentLoggedInProcessData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
+            console.log(url, '-url===========');
 
             const _resp = await fetch(url);
             const jsonData = await _resp.json();
+            console.log(jsonData, '-jsonData');
             if (!_resp.ok) {
-                throw new Error(jsonData?.errMsg || 'No candidate found');
+                throw new Error(jsonData?.errMsg || 'No candidate found1');
             }
 
             // console.log(jsonData, 'jsonData');
@@ -75,13 +77,14 @@ const ScanQrPage = () => {
             console.log(count++, '----------------count=============');
 
             if (authSlice?.currentLoggedinSlotData.slot != jsonData?.data?.slot?.slot || 0) {
-                throw new Error('No candidate found');
+                throw new Error('No candidate found2');
             } else {
                 dispatch(setCandidateAllData(jsonData?.data || []));
                 router.push('/candidate-info');
             }
         } catch (error) {
             dispatch(resetCandidateDataState());
+            console.log(error, '-error==============');
             Alert.alert('Info', error?.message || 'No candidate found', [
                 {
                     text: 'OK',
@@ -122,7 +125,7 @@ const ScanQrPage = () => {
             <AttendanceUpdator />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ProcessBannerImage
-                    processUrl={authSlice.currentLoggedInProcessData.p_form_filling_site}
+                // processUrl={}
                 />
                 <ScrollView scrollEnabled={false} showsVerticalScrollIndicator={false}>
                     <View

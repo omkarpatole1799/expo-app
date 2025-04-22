@@ -54,6 +54,9 @@ const ScanCamera = () => {
 
         const parsedQrData = JSON.parse(decryptedData);
 
+        console.log(parsedQrData, 'parsedQrADAta');
+        console.log(currentSlotData, '-currentSlotData');
+
         if (currentSlotData?.slot != parsedQrData.slot) {
             dispatch(resetCandidateDataState());
             Alert.alert('Info', 'No candidate found', [

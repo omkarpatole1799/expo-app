@@ -24,12 +24,19 @@ import { getProcessList } from './api';
 import Loading from '../UI/Loading';
 
 const defaultLoginFormValue = {
-    username: 'test', // Set the dummy username
-    password: 'test', // Set the dummy password
-    processUrl: 'http://192.168.1.2:3001',
-    slot: '1',
-    date: '03-05-2025',
-    center: '101',
+    // username: 'test', // Set the dummy username
+    // password: 'test', // Set the dummy password
+    // processUrl: 'http://192.168.1.2:3001',
+    // slot: '1',
+    // date: '03-05-2025',
+    // center: '101',
+
+    username: '', // Set the dummy username
+    password: '', // Set the dummy password
+    processUrl: '',
+    slot: '',
+    date: '',
+    center: '',
 };
 
 export default function Login() {
