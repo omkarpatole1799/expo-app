@@ -70,7 +70,6 @@ const initialState: CandidateDataSliceInterface = {
 const CandidateInfo = () => {
     const inset = useSafeAreaInsets();
     const { rollNumber } = useLocalSearchParams();
-    console.log(rollNumber, '-rollNumber =============');
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -109,6 +108,9 @@ const CandidateInfo = () => {
 
     let [justApproved, setJustApproved] = useState(false);
 
+    const openCamera = useCallback(() => setIsCameraOpen(true), []);
+    const closeCamera = useCallback(() => setIsCameraOpen(false), []);
+
     useEffect(() => {
         if (hallticket?.ca_is_approved && hallticket?.ca_approved_photo) {
             if (hallticket.ca_is_approved === 'NO') {
@@ -138,9 +140,7 @@ const CandidateInfo = () => {
             const data = await cameraRef.current.takePictureAsync();
             setPhotoUri(data.uri);
             setIsPictureTaken(true);
-            setIsCameraOpen(false);
-
-            console.log(data.uri, '-data.uri');
+            closeCamera();
         }
     };
 
@@ -153,7 +153,6 @@ const CandidateInfo = () => {
             );
             return result.uri;
         } catch (error) {
-            console.error('Error compressing image:', error);
             throw new Error('Image compression failed');
         }
     };
@@ -166,7 +165,7 @@ const CandidateInfo = () => {
 
             return fileContent; // You can send this base64 content to your server if necessary
         } catch (error) {
-            console.error('Error reading file:', error);
+            Alert.alert('Info', 'File read');
         }
     }
 
@@ -180,9 +179,11 @@ const CandidateInfo = () => {
 
             const sendData = new FormData();
 
-            sendData.set('rollNo', hallticket.ca_roll_number);
-            sendData.set('f_id', hallticket.id);
-            sendData.set('r_id', hallticket.ca_reg_id);
+            const { ca_roll_number, id, ca_reg_id } = hallticket;
+
+            sendData.set('rollNo', ca_roll_number);
+            sendData.set('f_id', id);
+            sendData.set('r_id', ca_reg_id);
             sendData.set('approved_by_user_id', `${currentLoggedInUserId}`);
 
             const compressedPhotoUri = await compressImage(photoUri);
@@ -193,7 +194,6 @@ const CandidateInfo = () => {
             sendData.set('candidatePhoto', base64Data);
 
             let url = `${processData.p_form_filling_site}/api/save-approval-details`;
-            console.log(url, '-url=====');
             const _resp = await fetch(url, {
                 method: 'POST',
                 body: sendData,
@@ -211,7 +211,6 @@ const CandidateInfo = () => {
                     onPress: () => {},
                 },
             ]);
-            console.error(err);
             setIsApproving(false);
         } finally {
             setIsApproving(false);
@@ -220,17 +219,14 @@ const CandidateInfo = () => {
 
     const getStudentByRollNumber = async (rollNumber: string | number | undefined) => {
         try {
-            console.log(rollNumber, '-this===============');
             if (!rollNumber) {
                 throw new Error('Invalid roll no');
             }
 
             const url = `${authSlice.currentLoggedInProcessData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
-            console.log(url, '-url===========');
 
             const _resp = await fetch(url);
             const jsonData = await _resp.json();
-            console.log(jsonData, '-jsonData');
             if (!_resp.ok) {
                 throw new Error(jsonData?.errMsg || 'No candidate found1');
             }
@@ -242,7 +238,6 @@ const CandidateInfo = () => {
             }
             setIsLoading(false);
         } catch (error) {
-            console.log(error, '-error==============');
             Alert.alert('Info', error?.message || 'No candidate found3', [
                 {
                     text: 'OK',
@@ -278,7 +273,7 @@ const CandidateInfo = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.closeButton, styles.buttonDanger]}
-                            onPress={() => setIsCameraOpen(false)}>
+                            onPress={closeCamera}>
                             <Text style={[styles.text, styles.scannerButtonText]}>Close</Text>
                         </TouchableOpacity>
                     </View>
@@ -299,11 +294,7 @@ const CandidateInfo = () => {
                                     photo={hallticket?.ca_photo || ''}
                                 />
 
-                                <TouchableOpacity
-                                    // disabled={isCandidateApproved}
-                                    onPress={() => {
-                                        setIsCameraOpen(true);
-                                    }}>
+                                <TouchableOpacity onPress={openCamera}>
                                     {/* Caputred image Image */}
 
                                     {isCandidateApproved || isPictureTaken ? (
@@ -457,9 +448,7 @@ const CandidateInfo = () => {
 
                             <BtnSecondary
                                 title={!photoUri ? 'Take Snap' : 'Retake Snap'}
-                                onPress={() => {
-                                    setIsCameraOpen(true);
-                                }}
+                                onPress={openCamera}
                             />
                         </View>
                     </View>
@@ -470,11 +459,11 @@ const CandidateInfo = () => {
     );
 };
 
-const DetailRow = ({ label, value }: { label: string; value: string | number }) => (
+const DetailRow = React.memo(({ label, value }: { label: string; value: string | number }) => (
     <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>{label}</Text>
         <Text style={styles.detailValue}>{value}</Text>
     </View>
-);
+));
 
 export default CandidateInfo;

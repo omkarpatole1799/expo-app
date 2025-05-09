@@ -1,9 +1,11 @@
 import { RootState } from '@/components/store/store';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { fetchAttendanceCount } from './api';
 import Loading from '../Loading';
+import { useFocusEffect } from 'expo-router';
+import BtnPrimary from '../BtnPrimary';
 
 const AttendanceCountComponent = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -18,27 +20,30 @@ const AttendanceCountComponent = () => {
 
     const slot = useSelector((state: RootState) => state.authSlice.currentLoggedinSlotData.slot);
 
+    const fetchAndSetAttendanceCount = async () => {
+        try {
+            const data = await fetchAttendanceCount(url, Number(slot));
+            setAttendanceCount(
+                data?.data[0] || {
+                    total_present_count: 0,
+                    total_student_count: 0,
+                }
+            );
+        } catch (error) {
+            console.error('Failed to fetch attendance:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (!url || !slot) return;
-
-        const fetchAndSetAttendanceCount = async () => {
-            try {
-                const data = await fetchAttendanceCount(url, Number(slot));
-                setAttendanceCount(
-                    data?.data[0] || {
-                        total_present_count: 0,
-                        total_student_count: 0,
-                    }
-                );
-            } catch (error) {
-                console.error('Failed to fetch attendance:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchAndSetAttendanceCount();
     }, [url, slot]);
+
+    useFocusEffect(() => {
+        fetchAndSetAttendanceCount();
+    });
 
     if (isLoading) {
         return <Loading />;

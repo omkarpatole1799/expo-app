@@ -1,7 +1,7 @@
 'use client';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     Keyboard,
