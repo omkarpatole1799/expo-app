@@ -5,23 +5,79 @@ import * as FileSystem from 'expo-file-system';
 import { RootState } from '@/components/store/store';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import CandidateProfilePhoto from '@/components/CandidateProfilePhoto';
 import CandidateSignature from '@/components/CandidateSignature';
 import BtnPrimary from '@/components/UI/BtnPrimary';
 import BtnSecondary from '@/components/UI/BtnSecondary';
 import { styles } from '@/constants/styles';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, Button, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-// import getUrl from '../../components/helper/getUrl';
+import { useSelector } from 'react-redux';
+import Loading from '@/components/UI/Loading';
+import { CandidateDataSliceInterface } from '@/types/candidateDataSliceInterface';
+
+const initialState: CandidateDataSliceInterface = {
+    qrData: {
+        f_id: 0,
+        r_id: 0,
+        slot: 0,
+        roll_no: 0,
+    },
+    candidateAllDetails: {
+        ca: {
+            id: 0,
+            ub_aadhar_number: '',
+            ub_alternative_number: '',
+            ub_email_id: '',
+            ub_first_name: '',
+            ub_last_name: '',
+            ub_middle_name: '',
+            ub_mobile_number: '',
+            ub_otp: '',
+            ub_pan_card: '',
+            ub_password: '',
+        },
+        ht: {
+            id: 0,
+            ca_reg_id: 0,
+
+            ca_photo: '',
+            ca_sign: '',
+            ca_approved_photo: '',
+            ca_is_approved: '',
+
+            ca_alloted_lab_id: 0,
+            exam_date: '',
+            lab_name: '',
+            department: '',
+            ca_gender: '',
+            ca_batch_time: '',
+        },
+        slot: {
+            id: 0,
+            entry_time: '',
+            gate_close_time: '',
+            slot: '',
+            time: '',
+        },
+        s3BucketUrl: '',
+    },
+};
 
 const CandidateInfo = () => {
     const inset = useSafeAreaInsets();
-    const candidateFullData = useSelector(
-        (state: RootState) => state.candidateData.candidateAllDetails
-    );
+    const { rollNumber } = useLocalSearchParams();
+    console.log(rollNumber, '-rollNumber =============');
+
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const [candidateAllData, setCandidateAllData] =
+        useState<CandidateDataSliceInterface>(initialState);
+
+    const authSlice = useSelector((state: RootState) => state.authSlice);
 
     const processData = useSelector(
         (state: RootState) => state.authSlice.currentLoggedInProcessData
@@ -31,22 +87,17 @@ const CandidateInfo = () => {
         (state: RootState) => state.authSlice.currentLoggedinSlotData.id
     );
 
+    useEffect(() => {
+        if (rollNumber) {
+            getStudentByRollNumber(rollNumber);
+        } else {
+            router.replace('/tabs/scan');
+        }
+    }, [rollNumber]);
+
+    const { p: process, ca: candidate, ht: hallticket, slot, s3BucketUrl } = candidateAllData;
+
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-
-    // console.log(candidateFullData, '==candidateFullData==');
-
-    const { p: process, ca: candidate, ht: hallticket, slot, s3BucketUrl } = candidateFullData;
-
-    // const extractQueryParams = (url) => {
-    // 	const params = new URLSearchParams(new URL(url).search);
-    // 	return {
-    // 		registrationId: params.get('r'),
-    // 		formId: params.get('f'),
-    // 	};
-    // };
-
-    // const { registrationId, formId } = extractQueryParams(sourceUrl);
-
     const [permission, requestPermission] = useCameraPermissions();
 
     const [isPictureTaken, setIsPictureTaken] = useState(false);
@@ -60,23 +111,15 @@ const CandidateInfo = () => {
     let [justApproved, setJustApproved] = useState(false);
 
     useEffect(() => {
-        console.log(hallticket.ca_is_approved);
-        console.log(hallticket.ca_approved_photo, '==hallticket.ca_approved_photo==');
-        if (hallticket.ca_is_approved === 'NO') {
-            setIsCandidateApproved(false);
-            setPhotoUri('');
-        } else {
-            setIsCandidateApproved(true);
+        if (hallticket?.ca_is_approved && hallticket?.ca_approved_photo) {
+            if (hallticket.ca_is_approved === 'NO') {
+                setIsCandidateApproved(false);
+                setPhotoUri('');
+            } else {
+                setIsCandidateApproved(true);
+            }
         }
-    }, []);
-
-    // if (!permission) {
-    //     return (
-    //         <View>
-    //             <Text>This is htis</Text>
-    //         </View>
-    //     );
-    // }
+    }, [hallticket]);
 
     if (permission) {
         if (!permission.granted) {
@@ -180,6 +223,45 @@ const CandidateInfo = () => {
         }
     };
 
+    const getStudentByRollNumber = async (rollNumber: string | number | undefined) => {
+        try {
+            console.log(rollNumber, '-this===============');
+            if (!rollNumber) {
+                throw new Error('Invalid roll no');
+            }
+
+            const url = `${authSlice.currentLoggedInProcessData.p_form_filling_site}/api/get-ht-details-by-roll-no?roll_no=${rollNumber}`;
+            console.log(url, '-url===========');
+
+            const _resp = await fetch(url);
+            const jsonData = await _resp.json();
+            console.log(jsonData, '-jsonData');
+            if (!_resp.ok) {
+                throw new Error(jsonData?.errMsg || 'No candidate found1');
+            }
+
+            if (authSlice?.currentLoggedinSlotData.slot != jsonData?.data?.slot?.slot || 0) {
+                throw new Error('No candidate found2');
+            } else {
+                setCandidateAllData(jsonData?.data || []);
+            }
+        } catch (error) {
+            console.log(error, '-error==============');
+            Alert.alert('Info', error?.message || 'No candidate found3', [
+                {
+                    text: 'OK',
+                    onPress: () => {},
+                },
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <SafeAreaView
             edges={['bottom']}
@@ -217,7 +299,7 @@ const CandidateInfo = () => {
 
                                 <CandidateProfilePhoto
                                     s3BucketUrl={s3BucketUrl}
-                                    photo={hallticket.ca_photo || ''}
+                                    photo={hallticket?.ca_photo || ''}
                                 />
 
                                 <TouchableOpacity
@@ -258,7 +340,7 @@ const CandidateInfo = () => {
 
                             <CandidateSignature
                                 s3BucketUrl={s3BucketUrl}
-                                sign={hallticket.ca_sign || ''}
+                                sign={hallticket?.ca_sign || ''}
                             />
 
                             <View
@@ -278,7 +360,7 @@ const CandidateInfo = () => {
                                         fontWeight: 700,
                                         letterSpacing: 0.5,
                                     }}>
-                                    {`${candidate.ub_first_name} ${candidate.ub_middle_name} ${candidate.ub_last_name}`}
+                                    {`${candidate?.ub_first_name} ${candidate?.ub_middle_name} ${candidate?.ub_last_name}`}
                                 </Text>
                                 <Text style={{ fontSize: 15, fontWeight: 600 }}>
                                     Allotment details
@@ -321,7 +403,7 @@ const CandidateInfo = () => {
                                             fontWeight: 500,
                                             letterSpacing: 0.5,
                                         }}>
-                                        Lab : {hallticket.lab_name || 'N/A'}
+                                        Lab : {hallticket?.lab_name || 'N/A'}
                                     </Text>
                                     <Text
                                         style={{
@@ -332,23 +414,23 @@ const CandidateInfo = () => {
                                             fontWeight: 500,
                                             letterSpacing: 0.5,
                                         }}>
-                                        Floor : {hallticket.floor || 'N/A'}
+                                        Floor : {hallticket?.floor || 'N/A'}
                                     </Text>
                                 </View>
                             </View>
                             <View style={styles.details}>
-                                <DetailRow label="Seat Number" value={hallticket.ca_roll_number} />
-                                <DetailRow label="Form Number" value={hallticket.id} />
+                                <DetailRow label="Seat Number" value={hallticket?.ca_roll_number} />
+                                <DetailRow label="Form Number" value={hallticket?.id} />
                                 <DetailRow
                                     label="Post Name"
-                                    value={hallticket.ca_post_name?.toUpperCase()}
+                                    value={hallticket?.ca_post_name?.toUpperCase()}
                                 />
                                 <DetailRow
                                     label="Gender"
-                                    value={hallticket.ca_gender?.toUpperCase()}
+                                    value={hallticket?.ca_gender?.toUpperCase()}
                                 />
-                                <DetailRow label="Exam Date" value={`${hallticket.exam_date}`} />
-                                <DetailRow label="Exam Time" value={`${slot.time}`} />
+                                <DetailRow label="Exam Date" value={`${hallticket?.exam_date}`} />
+                                <DetailRow label="Exam Time" value={`${slot?.time}`} />
                             </View>
                         </View>
                     </ScrollView>
@@ -391,7 +473,7 @@ const CandidateInfo = () => {
     );
 };
 
-const DetailRow = ({ label, value }) => (
+const DetailRow = ({ label, value }: { label: string; value: string | number }) => (
     <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>{label}</Text>
         <Text style={styles.detailValue}>{value}</Text>

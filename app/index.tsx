@@ -1,6 +1,7 @@
-import Login from '@/components/Login/Login';
+import { Redirect } from 'expo-router';
 import React from 'react';
 
 export default function Index() {
-    return <Login />;
+    // return <Login />;
+    return <Redirect href="/tabs/scan" />;
 }

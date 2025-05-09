@@ -6,13 +6,12 @@ import { Alert, Text, View } from 'react-native';
 import CryptoJS from 'react-native-crypto-js';
 const secretKey = 'form-filling-secret-key'; // Key for encryption/decryption
 
-import { resetCandidateDataState, setQrData } from '@/components/store/candidate-data-slice';
 import { RootState } from '@/components/store/store';
 import BtnSecondary from '@/components/UI/BtnSecondary';
 import { styles } from '@/constants/styles';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const ScanCamera = () => {
     const [isPauseScanning, setIsPauseScanning] = useState(false);
@@ -20,8 +19,9 @@ const ScanCamera = () => {
     const currentSlotData = useSelector(
         (state: RootState) => state.authSlice.currentLoggedinSlotData
     );
+
     const [permission, requestPermission] = useCameraPermissions();
-    const dispatch = useDispatch();
+
     if (!permission) {
         return (
             <View style={styles.container}>
@@ -58,18 +58,16 @@ const ScanCamera = () => {
         console.log(currentSlotData, '-currentSlotData');
 
         if (currentSlotData?.slot != parsedQrData.slot) {
-            dispatch(resetCandidateDataState());
             Alert.alert('Info', 'No candidate found', [
                 {
                     text: 'ok',
                     onPress: () => {
-                        router.replace('/scan');
+                        router.replace('/tabs/scan');
                     },
                 },
             ]);
         } else {
-            dispatch(setQrData(parsedQrData));
-            router.replace('/scan');
+            router.replace(`/candidate-info/${parsedQrData.roll_no}`);
         }
     };
 
