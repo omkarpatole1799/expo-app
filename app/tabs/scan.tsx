@@ -1,9 +1,10 @@
 'use client';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
     Alert,
+    Keyboard,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -19,22 +20,15 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ScanQrPage = () => {
-    const rollNumberInputRef = useRef<HTMLInputElement>(null);
+    const [rollNumber, setRollNumber] = useState('');
 
     const handleSearchCandidate = () => {
-        const rollNumber = rollNumberInputRef?.current?.value;
-
-        if (rollNumber == '' || !rollNumber) {
-            Alert.alert('Info', 'Please enter valid roll number', [
-                {
-                    text: 'OK',
-                    onPress: () => {
-                        rollNumberInputRef?.current?.focus();
-                    },
-                },
-            ]);
+        Keyboard.dismiss();
+        if (rollNumber?.trim() == '' || !rollNumber) {
+            Alert.alert('Info', 'Please enter valid roll number');
+            return;
         }
-        router.push(`/candidate-info/${rollNumber}`);
+        router.push(`/candidate-info/${rollNumber?.trim()}`);
     };
 
     return (
@@ -44,9 +38,7 @@ const ScanQrPage = () => {
                 padding: 10,
             }}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <ProcessBannerImage
-                // processUrl={}
-                />
+                <ProcessBannerImage />
                 <ScrollView scrollEnabled={false} showsVerticalScrollIndicator={false}>
                     <View
                         style={{
@@ -63,8 +55,8 @@ const ScanQrPage = () => {
                                 gap: 10,
                             }}>
                             <TextInput
-                                ref={rollNumberInputRef}
-                                onChangeText={(e) => (rollNumberInputRef.current.value = e)}
+                                value={rollNumber}
+                                onChangeText={setRollNumber}
                                 style={styles.input}
                                 keyboardType="number-pad"
                                 placeholder="Roll Number"

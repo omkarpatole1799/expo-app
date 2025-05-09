@@ -1,15 +1,13 @@
 import { setCurrentLoggedInProcessData } from '@/components/store/auth-slice';
-import { RootState } from '@/components/store/store';
 import BtnPrimary from '@/components/UI/BtnPrimary';
 import BtnSecondary from '@/components/UI/BtnSecondary';
 import InputLabel from '@/components/UI/InputLabel';
 import { styles } from '@/constants/styles';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
-    ActivityIndicator,
     Alert,
     KeyboardAvoidingView,
     Platform,
@@ -19,9 +17,9 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProcessList } from './api';
+import { useDispatch } from 'react-redux';
 import Loading from '../UI/Loading';
+import { getProcessList } from './api';
 
 const defaultLoginFormValue = {
     // username: 'test', // Set the dummy username
@@ -107,7 +105,7 @@ export default function Login() {
                 })
             );
 
-            router.replace('/scan');
+            router.replace('/tabs/scan');
         } catch (error) {
             Alert.alert('Error', error?.message || 'Not able to login', [
                 {

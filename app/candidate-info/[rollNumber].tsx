@@ -102,7 +102,6 @@ const CandidateInfo = () => {
 
     const [isPictureTaken, setIsPictureTaken] = useState(false);
     const [photoUri, setPhotoUri] = useState('');
-    const [facing, setFacing] = useState('back');
     const cameraRef = useRef(null);
 
     const [isCandidateApproved, setIsCandidateApproved] = useState(false);
@@ -131,10 +130,6 @@ const CandidateInfo = () => {
             );
         }
     }
-
-    const toggleCameraFacing = () => {
-        setFacing((prevFacing) => (prevFacing === 'front' ? 'back' : 'front'));
-    };
 
     const handleTakePicture = async () => {
         setJustApproved(false);
@@ -245,16 +240,18 @@ const CandidateInfo = () => {
             } else {
                 setCandidateAllData(jsonData?.data || []);
             }
+            setIsLoading(false);
         } catch (error) {
             console.log(error, '-error==============');
             Alert.alert('Info', error?.message || 'No candidate found3', [
                 {
                     text: 'OK',
-                    onPress: () => {},
+                    onPress: () => {
+                        setIsLoading(false);
+                        router.replace('/tabs/scan');
+                    },
                 },
             ]);
-        } finally {
-            setIsLoading(false);
         }
     };
 

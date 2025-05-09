@@ -9,42 +9,43 @@ interface AuthSliceInterface {
         id: number;
         password: string;
         processUrl: string;
-        role: string;
+        roll: string;
         slot: string;
-        username: string;
+        user_name: string;
     };
 }
 
-// const initialState: AuthSliceInterface = {
-//     isAuth: false,
-//     currentLoggedInProcessData: {
-//         p_form_filling_site: '',
-//     },
-//     currentLoggedinSlotData: {
-//         // This is current logged in user details (i.e. slot)
-//         id: 0,
-//         password: '',
-//         processUrl: '',
-//         role: '',
-//         slot: '',
-//         username: '',
-//     },
-// };
 const initialState: AuthSliceInterface = {
     isAuth: false,
     currentLoggedInProcessData: {
-        p_form_filling_site: 'https://101.apmcmangrulpir.in',
+        p_form_filling_site: '',
     },
     currentLoggedinSlotData: {
         // This is current logged in user details (i.e. slot)
         id: 0,
-        password: 'test',
-        processUrl: 'https://101.apmcmangrulpir.in',
-        role: 'BIOMETRIC',
-        slot: '2',
-        username: 'test',
+        password: '',
+        processUrl: '',
+        roll: '',
+        slot: '',
+        user_name: '',
     },
 };
+
+// const initialState: AuthSliceInterface = {
+//     isAuth: true,
+//     currentLoggedInProcessData: {
+//         p_form_filling_site: 'https://101.apmcmangrulpir.in',
+//     },
+//     currentLoggedinSlotData: {
+//         // This is current logged in user details (i.e. slot)
+//         id: 0,
+//         password: 'test',
+//         processUrl: 'https://101.apmcmangrulpir.in',
+//         roll: 'BIOMETRIC',
+//         slot: '2',
+//         user_name: 'test',
+//     },
+// };
 
 const authSlice = createSlice({
     name: 'auth-slice',

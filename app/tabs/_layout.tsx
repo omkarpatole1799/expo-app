@@ -28,6 +28,7 @@ const tabsLayout = () => {
                     options={{
                         title: 'Profile',
                         tabBarIcon: () => <AntDesign name="home" size={20} color="black" />,
+                        headerShown: false,
                     }}
                 />
             </Tabs>

@@ -1,13 +1,12 @@
 import { RootState } from '@/components/store/store';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { fetchAttendanceCount } from './api';
 import Loading from '../Loading';
 
 const AttendanceCountComponent = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
     const [attendanceCount, setAttendanceCount] = useState({
         total_present_count: 0,
         total_student_count: 0,
@@ -19,25 +18,26 @@ const AttendanceCountComponent = () => {
 
     const slot = useSelector((state: RootState) => state.authSlice.currentLoggedinSlotData.slot);
 
-    async function fetchAndSetAttendanceCount(url: string, slot: number) {
-        const data = await fetchAttendanceCount(url, slot);
-        console.log(data, '-data');
-
-        setAttendanceCount(
-            data?.data[0] || {
-                total_present_count: 0,
-                total_student_count: 0,
-            }
-        );
-
-        setIsLoading(false);
-    }
-
     useEffect(() => {
-        console.log(url, slot);
         if (!url || !slot) return;
 
-        fetchAndSetAttendanceCount(url, Number(slot));
+        const fetchAndSetAttendanceCount = async () => {
+            try {
+                const data = await fetchAttendanceCount(url, Number(slot));
+                setAttendanceCount(
+                    data?.data[0] || {
+                        total_present_count: 0,
+                        total_student_count: 0,
+                    }
+                );
+            } catch (error) {
+                console.error('Failed to fetch attendance:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAndSetAttendanceCount();
     }, [url, slot]);
 
     if (isLoading) {
@@ -45,22 +45,31 @@ const AttendanceCountComponent = () => {
     }
 
     return (
-        <View
-            style={{
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-            <Text
-                style={{
-                    padding: 2,
-                    fontSize: 22,
-                    marginTop: 30,
-                }}>
+        <View style={styles.container}>
+            <Text style={styles.label}>Attendance</Text>
+            <Text style={styles.count}>
                 {attendanceCount.total_present_count} / {attendanceCount.total_student_count}
             </Text>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        paddingVertical: 30,
+    },
+    label: {
+        fontSize: 18,
+        color: '#555',
+        fontWeight: '500',
+        marginBottom: 6,
+    },
+    count: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#2b2b2b',
+    },
+});
 
 export default AttendanceCountComponent;
